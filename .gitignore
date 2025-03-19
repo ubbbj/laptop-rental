@@ -1,0 +1,8 @@
+# Ignorowanie zależności
+node_modules/
+.env
+
+# Ignorowanie plików systemowych
+.DS_Store
+.idea/
+.vscode/
