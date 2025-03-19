@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import LaptopList from './components/LaptopList';
+import ScanQR from './components/ScanQR';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <nav>
+        <Link to="/">Lista laptopów</Link> | <Link to="/scan">Skanuj QR</Link>
+      </nav>
+      <Routes>
+        <Route path="/" element={<LaptopList />} />
+        <Route path="/scan" element={<ScanQR />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
