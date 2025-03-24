@@ -23,4 +23,15 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Pobieranie wszystkich laptopów
+router.get('/', async (req, res) => {
+  try {
+    const laptops = await Laptop.find();
+    res.json(laptops);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Błąd podczas pobierania laptopów' });
+  }
+});
+
 module.exports = router;
