@@ -9,7 +9,9 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://laptop-rental-nine.vercel.app'
+}));
 
 // Połączenie z MongoDB
 mongoose.connect(process.env.MONGO_URI, {
