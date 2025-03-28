@@ -8,7 +8,7 @@ const LaptopList = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('http://localhost:5000/api/laptops')
+    axios.get(`${process.env.REACT_APP_API_URL}/api/laptops`)
       .then(response => {
         setLaptops(response.data);
         setLoading(false);
