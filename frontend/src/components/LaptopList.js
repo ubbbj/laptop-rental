@@ -45,10 +45,6 @@ const LaptopList = () => {
                 {laptop.isRented ? 'Wypożyczony' : 'Dostępny'}
               </div>
               
-              {laptop.isRented && (
-                <p>Wypożyczony przez: {laptop.rentedBy}</p>
-              )}
-              
               <img src={laptop.qrCode} alt="Kod QR" width="150" />
             </div>
           ))}
