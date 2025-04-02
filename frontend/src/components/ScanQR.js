@@ -62,7 +62,7 @@ const ScanQR = () => {
 
     const serialNumber = url.split('/').pop();
     try {
-      const response = await axios.get(`http://localhost:5000/api/laptops/${serialNumber}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/laptops/${serialNumber}`);
       setLaptopInfo(response.data);
     } catch (err) {
       console.error("Błąd pobierania danych laptopa:", err);
@@ -76,7 +76,7 @@ const ScanQR = () => {
     if (!laptopInfo) return;
 
     try {
-      await axios.put(`http://localhost:5000/api/laptops/${laptopInfo.serialNumber}/rent`);
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/laptops/${laptopInfo.serialNumber}/rent`);
       setLaptopInfo({ ...laptopInfo, isRented: true });
     } catch (err) {
       console.error("Błąd wypożyczania laptopa:", err);
