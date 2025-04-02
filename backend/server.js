@@ -16,13 +16,22 @@ app.use((req, res, next) => {
 });
 
 // Konfiguracja dozwolonych źródeł
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
 console.log('Allowed origins:', allowedOrigins);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 // Połączenie z MongoDB
