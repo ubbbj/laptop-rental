@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Pobieranie wszystkich laptopów - dostępne dla wszystkich
+// Pobieranie wszystkich laptopów
 router.get('/', async (req, res) => {
   try {
     const laptops = await Laptop.find();
@@ -29,6 +29,50 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Błąd podczas pobierania laptopów' });
+  }
+});
+
+// Pobieranie pojedynczego laptopa po numerze seryjnym
+router.get('/:serialNumber', async (req, res) => {
+  try {
+    const laptop = await Laptop.findOne({ serialNumber: req.params.serialNumber });
+    if (!laptop) {
+      return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+    res.json(laptop);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Błąd podczas pobierania laptopa' });
+  }
+});
+
+// Zmieniamy status laptopa na 'wypożyczony'
+router.put('/:serialNumber/rent', async (req, res) => {
+  try {
+    const { serialNumber } = req.params;
+
+    // Szukamy laptopa po numerze seryjnym
+    const laptop = await Laptop.findOne({ serialNumber });
+
+    if (!laptop) {
+      return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+
+    if (laptop.isRented) {
+      return res.status(400).json({ error: 'Laptop już jest wypożyczony' });
+    }
+
+    // Zmieniamy status laptopa na wypożyczony
+    laptop.isRented = true;
+    laptop.rentedBy = 'Wypożyczający użytkownik';  // Możesz dodać logikę, aby zapisać użytkownika
+    laptop.rentedAt = new Date();
+    
+    await laptop.save();
+
+    res.json(laptop);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Błąd podczas aktualizacji laptopa' });
   }
 });
 
