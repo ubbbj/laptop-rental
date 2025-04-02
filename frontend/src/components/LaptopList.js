@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const LaptopList = () => {
+const LaptopList = ({ isAdmin }) => {
   const [laptops, setLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,6 +46,29 @@ const LaptopList = () => {
               </div>
               
               <img src={laptop.qrCode} alt="Kod QR" width="150" />
+              
+              {isAdmin && (
+                <button
+                  className="delete-button"
+                  onClick={async () => {
+                    if (window.confirm(`Czy na pewno chcesz usunąć laptop ${laptop.serialNumber}?`)) {
+                      try {
+                        await axios.delete(`${process.env.REACT_APP_API_URL}/api/laptops/${laptop.serialNumber}`, {
+                          headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`
+                          }
+                        });
+                        setLaptops(laptops.filter(l => l.serialNumber !== laptop.serialNumber));
+                      } catch (error) {
+                        console.error('Błąd usuwania laptopa:', error);
+                        alert('Nie udało się usunąć laptopa');
+                      }
+                    }
+                  }}
+                >
+                  Usuń laptop
+                </button>
+              )}
             </div>
           ))}
         </div>

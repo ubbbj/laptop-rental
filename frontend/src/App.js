@@ -57,7 +57,7 @@ const App = () => {
       </nav>
       <main>
         <Routes>
-          <Route path="/" element={<LaptopList />} />
+          <Route path="/" element={<LaptopList isAdmin={isAdmin} />} />
           <Route path="/add" element={<AddLaptopForm />} />
           <Route path="/scan" element={<ScanQR />} />
           <Route path="/login" element={<LoginForm />} />
