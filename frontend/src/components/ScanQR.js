@@ -56,28 +56,32 @@ const ScanQR = () => {
     };
   }, []);
 
-  const fetchLaptopInfo = (url) => {
-    // Tutaj możesz dodać logikę pobierania informacji o laptopie
-    // na podstawie zeskanowanego URL
-    // Na razie tylko symulujemy to
+  const fetchLaptopInfo = async (url) => {
     setLoading(true);
     setError(null);
-    
-    // Przykładowa symulacja pobierania danych
-    setTimeout(() => {
-      setLaptopInfo({
-        brand: "Przykładowy Brand",
-        model: "Model X",
-        serialNumber: "SN12345678",
-        isRented: false
-      });
+
+    const serialNumber = url.split('/').pop();
+    try {
+      const response = await axios.get(`http://localhost:5000/api/laptops/${serialNumber}`);
+      setLaptopInfo(response.data);
+    } catch (err) {
+      console.error("Błąd pobierania danych laptopa:", err);
+      setError("Nie znaleziono informacji o laptopie.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleRentLaptop = () => {
-    // Tutaj dodaj logikę wypożyczania laptopa
-    alert("Funkcja wypożyczania zostanie zaimplementowana wkrótce!");
+  const handleRentLaptop = async () => {
+    if (!laptopInfo) return;
+
+    try {
+      await axios.put(`http://localhost:5000/api/laptops/${laptopInfo.serialNumber}/rent`);
+      setLaptopInfo({ ...laptopInfo, isRented: true });
+    } catch (err) {
+      console.error("Błąd wypożyczania laptopa:", err);
+      setError("Nie udało się wypożyczyć laptopa.");
+    }
   };
 
   return (

@@ -15,6 +15,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// Konfiguracja dozwolonych źródeł
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 console.log('Allowed origins:', allowedOrigins);
 
@@ -44,6 +45,9 @@ app.use('/api/laptops', laptopRoutes);
 
 // POST /api/laptops - wymaga autentykacji i roli admina
 app.post('/api/laptops', authenticate, isAdmin, laptopRoutes);
+
+// PUT /api/laptops/:serialNumber/rent - wymaga autentykacji i roli admina
+app.put('/api/laptops/:serialNumber/rent', authenticate, isAdmin, laptopRoutes); // Obsługuje wypożyczenie laptopa
 
 // Endpoint główny
 app.get('/', (req, res) => res.send('API is running'));
