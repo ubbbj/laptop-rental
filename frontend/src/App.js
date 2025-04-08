@@ -12,6 +12,7 @@ import './App.css';
 const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
   const location = useLocation();
 
   useEffect(() => {
@@ -21,6 +22,7 @@ const App = () => {
         const decoded = jwtDecode(token);
         setIsAdmin(decoded.role === 'admin');
         setIsLoggedIn(true);
+        setUsername(decoded.email || 'Użytkownik');
       } catch (error) {
         console.error('Error decoding token:', error);
         setIsLoggedIn(false);
@@ -42,15 +44,37 @@ const App = () => {
     <div className="App">
       <nav>
         <div className="nav-links">
-          <Link to="/">Lista laptopów</Link>
-          {isAdmin && <Link to="/add">Dodaj laptop</Link>}
-          <Link to="/scan">Skanuj QR</Link>
+          <Link to="/">
+            <span role="img" aria-label="laptops">💻</span> Lista laptopów
+          </Link>
+          
+          {isAdmin && 
+            <Link to="/add">
+              <span role="img" aria-label="add">➕</span> Dodaj laptop
+            </Link>
+          }
+          
+          <Link to="/scan">
+            <span role="img" aria-label="scan">🔍</span> Skanuj QR
+          </Link>
+          
           {isLoggedIn ? (
-            <button onClick={handleLogout} className="logout-button">Wyloguj</button>
+            <>
+              <span style={{color: 'white', marginLeft: 'auto', padding: '15px 10px'}}>
+                <span role="img" aria-label="user">👤</span> {username}
+              </span>
+              <button onClick={handleLogout} className="logout-button">
+                <span role="img" aria-label="logout">🚪</span> Wyloguj
+              </button>
+            </>
           ) : (
             <>
-              <Link to="/login">Zaloguj</Link>
-              <Link to="/register">Zarejestruj</Link>
+              <Link to="/login" style={{marginLeft: 'auto'}}>
+                <span role="img" aria-label="login">🔑</span> Zaloguj
+              </Link>
+              <Link to="/register">
+                <span role="img" aria-label="register">📝</span> Zarejestruj
+              </Link>
             </>
           )}
         </div>
