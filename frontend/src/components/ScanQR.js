@@ -8,6 +8,15 @@ const ScanQR = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const scannerRef = useRef(null);
+  const [showRentalForm, setShowRentalForm] = useState(false);
+  const [rentalData, setRentalData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    startDate: '', // Dodano startDate
+    endDate: ''    // Dodano endDate
+  });
+  const [rentalSuccess, setRentalSuccess] = useState(false);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -72,17 +81,60 @@ const ScanQR = () => {
     }
   };
 
-  const handleRentLaptop = async () => {
+  // Zmieniono handleRentLaptop na otwarcie formularza
+  const handleOpenRentalForm = () => {
+    setShowRentalForm(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setRentalData({
+      ...rentalData,
+      [name]: value
+    });
+  };
+
+  const handleRentalSubmit = async (e) => {
+    e.preventDefault();
+    
     if (!laptopInfo) return;
+    setLoading(true);
+    setError(null);
+    const token = localStorage.getItem('token');
 
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/laptops/${laptopInfo.serialNumber}/rent`);
-      setLaptopInfo({ ...laptopInfo, isRented: true });
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/rentals`,
+        {
+          laptopId: laptopInfo._id,
+          ...rentalData
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setRentalSuccess(true);
+      setShowRentalForm(false);
+      // Aktualizujemy status lokalnie, zakładając, że backend ustawił go na 'pending'
+      setLaptopInfo({ ...laptopInfo, isRented: true, rentalStatus: 'pending' });
     } catch (err) {
-      console.error("Błąd wypożyczania laptopa:", err);
-      setError("Nie udało się wypożyczyć laptopa.");
+      console.error("Błąd wysyłania wniosku o wypożyczenie:", err);
+      setError("Nie udało się wysłać wniosku o wypożyczenie. Spróbuj ponownie.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const cancelRentalForm = () => {
+    setShowRentalForm(false);
+    setRentalData({
+      fullName: '',
+      email: '',
+      phone: '',
+      startDate: '', // Dodano reset dat
+      endDate: ''
+    });
+  };
+
+  // Usunięto stare funkcje rezerwacji
 
   return (
     <div>
@@ -106,10 +158,100 @@ const ScanQR = () => {
               <div className="laptop-info">
                 <h4>{laptopInfo.brand} {laptopInfo.model}</h4>
                 <p>Numer seryjny: {laptopInfo.serialNumber}</p>
-                <p>Status: {laptopInfo.isRented ? 'Wypożyczony' : 'Dostępny'}</p>
+                <p>Status: {laptopInfo.isRented ? (laptopInfo.rentalStatus === 'pending' ? 'Oczekuje na potwierdzenie' : 'Wypożyczony') : 'Dostępny'}</p>
                 
-                {!laptopInfo.isRented && (
-                  <button onClick={handleRentLaptop}>Wypożycz laptop</button>
+                {/* Przycisk otwiera formularz */}
+                {!laptopInfo.isRented && !showRentalForm && (
+                  <div className="laptop-actions">
+                    <button onClick={handleOpenRentalForm}>Wypożycz teraz</button>
+                  </div>
+                )}
+
+                {/* Formularz wypożyczenia */}
+                {showRentalForm && (
+                  <div className="rental-form-container"> {/* Zmieniono klasę CSS */}
+                    <h4>Formularz wypożyczenia laptopa</h4>
+                    <form onSubmit={handleRentalSubmit}>
+                      {/* Dodano pola dat */}
+                      <div className="form-group">
+                        <label htmlFor="startDate">Data rozpoczęcia:</label>
+                        <input
+                          type="date"
+                          id="startDate"
+                          name="startDate"
+                          value={rentalData.startDate}
+                          onChange={handleInputChange}
+                          required
+                          min={new Date().toISOString().split('T')[0]} // Minimalna data to dzisiaj
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="endDate">Data zakończenia:</label>
+                        <input
+                          type="date"
+                          id="endDate"
+                          name="endDate"
+                          value={rentalData.endDate}
+                          onChange={handleInputChange}
+                          required
+                          min={rentalData.startDate || new Date().toISOString().split('T')[0]} // Minimalna data to data rozpoczęcia lub dzisiaj
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="fullName">Imię i nazwisko:</label>
+                        <input
+                          type="text"
+                          id="fullName"
+                          name="fullName"
+                          value={rentalData.fullName}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="email">Email:</label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          value={rentalData.email}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="phone">Telefon:</label>
+                        <input
+                          type="tel"
+                          id="phone"
+                          name="phone"
+                          value={rentalData.phone}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                                            
+                      <div className="form-actions">
+                        <button type="submit" disabled={loading}>
+                          {loading ? 'Przetwarzanie...' : 'Wyślij wniosek'}
+                        </button>
+                        <button type="button" onClick={cancelRentalForm}>
+                          Anuluj
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Komunikat sukcesu */}
+                {rentalSuccess && (
+                  <div className="success-message">
+                    <p>Wniosek o wypożyczenie został wysłany!</p>
+                    <p>Administrator wkrótce go rozpatrzy.</p>
+                  </div>
                 )}
               </div>
             ) : (
@@ -119,6 +261,8 @@ const ScanQR = () => {
             <button onClick={() => {
               setScanResult('');
               setLaptopInfo(null);
+              setShowRentalForm(false); // Dodano reset formularza
+              setRentalSuccess(false); // Dodano reset sukcesu
               if (scannerRef.current) {
                 try {
                   scannerRef.current.render(

@@ -90,4 +90,83 @@ router.delete('/:serialNumber', authenticate, isAdmin, async (req, res) => {
   }
 });
 
+// Rezerwacja laptopa
+router.post('/:serialNumber/reserve', async (req, res) => {
+  try {
+    const { serialNumber } = req.params;
+    const { startDate, endDate, fullName, email, phone, notes } = req.body;
+
+    // Szukamy laptopa po numerze seryjnym
+    const laptop = await Laptop.findOne({ serialNumber });
+
+    if (!laptop) {
+      return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+
+    if (laptop.isRented) {
+      return res.status(400).json({ error: 'Laptop jest już wypożyczony' });
+    }
+
+    if (laptop.isReserved) {
+      return res.status(400).json({ error: 'Laptop jest już zarezerwowany' });
+    }
+
+    // Tworzymy rezerwację
+    laptop.isReserved = true;
+    laptop.reservation = {
+      startDate,
+      endDate,
+      fullName,
+      email,
+      phone,
+      notes
+    };
+    
+    await laptop.save();
+
+    // Tutaj możesz dodać logikę wysłania potwierdzenia email
+    // np. używając nodemailer
+
+    res.json({
+      message: 'Laptop został pomyślnie zarezerwowany',
+      laptop
+    });
+  } catch (error) {
+    console.error('Błąd rezerwacji laptopa:', error);
+    res.status(500).json({ error: 'Błąd podczas rezerwacji laptopa' });
+  }
+});
+
+// Anulowanie rezerwacji laptopa
+router.put('/:serialNumber/cancel-reservation', async (req, res) => {
+  try {
+    const { serialNumber } = req.params;
+
+    // Szukamy laptopa po numerze seryjnym
+    const laptop = await Laptop.findOne({ serialNumber });
+
+    if (!laptop) {
+      return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+
+    if (!laptop.isReserved) {
+      return res.status(400).json({ error: 'Laptop nie jest zarezerwowany' });
+    }
+
+    // Usuwamy rezerwację
+    laptop.isReserved = false;
+    laptop.reservation = null;
+    
+    await laptop.save();
+
+    res.json({
+      message: 'Rezerwacja została anulowana',
+      laptop
+    });
+  } catch (error) {
+    console.error('Błąd anulowania rezerwacji:', error);
+    res.status(500).json({ error: 'Błąd podczas anulowania rezerwacji' });
+  }
+});
+
 module.exports = router;

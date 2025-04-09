@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const laptopRoutes = require('./routes/laptops');
 const { router: authRouter, authenticate, isAdmin } = require('./routes/auth');
+const rentalRoutes = require('./routes/rentals');
 
 // Inicjalizacja aplikacji Express
 const app = express();
@@ -49,14 +50,9 @@ mongoose.connect(process.env.MONGO_URI, {
 // Użycie routerów
 app.use('/api/auth', authRouter);
 
-// GET /api/laptops - dostępne dla wszystkich
+// Używamy laptopRoutes dla wszystkich tras /api/laptops
 app.use('/api/laptops', laptopRoutes);
-
-// POST /api/laptops - wymaga autentykacji i roli admina
-app.post('/api/laptops', authenticate, isAdmin, laptopRoutes);
-
-// PUT /api/laptops/:serialNumber/rent - wymaga autentykacji i roli admina
-app.put('/api/laptops/:serialNumber/rent', authenticate, isAdmin, laptopRoutes); // Obsługuje wypożyczenie laptopa
+app.use('/api/rentals', rentalRoutes);
 
 // Endpoint główny
 app.get('/', (req, res) => res.send('API is running'));

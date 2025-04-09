@@ -5,6 +5,7 @@ import ScanQR from './components/ScanQR';
 import AddLaptopForm from './components/AddLaptopForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
+import RentalManagement from './components/RentalManagement';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
@@ -47,10 +48,15 @@ const App = () => {
           <Link to="/">
             <span role="img" aria-label="laptops">💻</span> Lista laptopów
           </Link>
-          
-          {isAdmin && 
+            {isAdmin && 
             <Link to="/add">
               <span role="img" aria-label="add">➕</span> Dodaj laptop
+            </Link>
+          }
+          
+          {isAdmin && 
+            <Link to="/rentals">
+              <span role="img" aria-label="rentals">💻</span> Wypożyczenia
             </Link>
           }
           
@@ -78,14 +84,14 @@ const App = () => {
             </>
           )}
         </div>
-      </nav>
-      <main>
+      </nav>      <main>
         <Routes>
           <Route path="/" element={<LaptopList isAdmin={isAdmin} />} />
-          <Route path="/add" element={<AddLaptopForm />} />
+          <Route path="/add" element={isAdmin ? <AddLaptopForm /> : <Navigate to="/" />} />
           <Route path="/scan" element={<ScanQR />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
+          <Route path="/rentals" element={isAdmin ? <RentalManagement /> : <Navigate to="/" />} />
         </Routes>
       </main>
     </div>
