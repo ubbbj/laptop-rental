@@ -7,12 +7,22 @@ const { authenticate, isAdmin } = require('./auth');
 // Tworzenie nowego laptopa z kodem QR
 router.post('/', authenticate, isAdmin, async (req, res) => {
   try {
-    const { brand, model, serialNumber } = req.body;
+    // Dodano nowe pola
+    const { brand, model, serialNumber, description, specs, images } = req.body;
     
     const qrData = `https://twoja-aplikacja.com/laptop/${serialNumber}`;
     const qrCode = await QRCode.toDataURL(qrData);
 
-    const newLaptop = new Laptop({ brand, model, serialNumber, qrCode });
+    // Dodano nowe pola do tworzonego obiektu
+    const newLaptop = new Laptop({
+      brand,
+      model,
+      serialNumber,
+      qrCode,
+      description,
+      specs,
+      images: images || [] // Upewnij się, że images jest tablicą
+    });
     await newLaptop.save();
 
     res.json(newLaptop);
@@ -33,38 +43,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.put('/:serialNumber/rent', async (req, res) => {
-  try {
-    const { serialNumber } = req.params;
+// Usunięto stary endpoint /rent - obsługa wypożyczeń jest w rentals.js
 
-    // Szukamy laptopa po numerze seryjnym
-    const laptop = await Laptop.findOne({ serialNumber });
-
-    if (!laptop) {
-      return res.status(404).json({ error: 'Laptop nie znaleziony' });
-    }
-
-    if (laptop.isRented) {
-      return res.status(400).json({ error: 'Laptop już jest wypożyczony' });
-    }
-
-    // Zmieniamy status laptopa na wypożyczony
-    laptop.isRented = true;
-    laptop.rentedBy = 'Wypożyczający użytkownik';  // Możesz dodać logikę, aby zapisać użytkownika
-    laptop.rentedAt = new Date();
-    
-    await laptop.save();
-
-    res.json(laptop);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Błąd podczas aktualizacji laptopa' });
-  }
-});
-
-// Pobieranie pojedynczego laptopa po numerze seryjnym
+// Pobieranie pojedynczego laptopa po ID lub numerze seryjnym
+// Zmieniono na ID dla spójności z innymi trasami PUT/DELETE
 router.get('/:serialNumber', async (req, res) => {
   try {
+    // Można szukać po ID lub serialNumber, tutaj zostawiono serialNumber
     const laptop = await Laptop.findOne({ serialNumber: req.params.serialNumber });
     if (!laptop) {
       return res.status(404).json({ error: 'Laptop nie znaleziony' });
@@ -76,10 +61,54 @@ router.get('/:serialNumber', async (req, res) => {
   }
 });
 
-// Usuwanie laptopa (tylko dla adminów)
+// Aktualizacja laptopa (tylko dla adminów)
+router.put('/:id', authenticate, isAdmin, async (req, res) => {
+  try {
+    const { brand, model, serialNumber, description, specs, images } = req.body;
+    
+    // Generowanie nowego QR kodu jeśli numer seryjny się zmienił
+    let qrCode = req.body.qrCode; // Zachowaj stary, jeśli nie ma zmiany SN
+    const existingLaptop = await Laptop.findById(req.params.id);
+    if (!existingLaptop) {
+       return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+    if (serialNumber && existingLaptop.serialNumber !== serialNumber) {
+       const qrData = `https://twoja-aplikacja.com/laptop/${serialNumber}`;
+       qrCode = await QRCode.toDataURL(qrData);
+    }
+
+    const updatedLaptop = await Laptop.findByIdAndUpdate(
+      req.params.id,
+      {
+        brand,
+        model,
+        serialNumber,
+        description,
+        specs,
+        images: images || [], // Upewnij się, że images jest tablicą
+        qrCode // Zaktualizuj QR kod jeśli trzeba
+      },
+      { new: true } // Zwraca zaktualizowany dokument
+    );
+
+    if (!updatedLaptop) {
+      return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+    res.json(updatedLaptop);
+  } catch (error) {
+    console.error('Błąd aktualizacji laptopa:', error);
+    // Obsługa błędu duplikatu klucza (unique: true dla serialNumber)
+    if (error.code === 11000) {
+       return res.status(400).json({ error: 'Numer seryjny musi być unikalny.' });
+    }
+    res.status(500).json({ error: 'Błąd serwera podczas aktualizacji laptopa' });
+  }
+});
+
+// Usuwanie laptopa (tylko dla adminów) - zmieniono na ID
 router.delete('/:serialNumber', authenticate, isAdmin, async (req, res) => {
   try {
-    const laptop = await Laptop.findOneAndDelete({ serialNumber: req.params.serialNumber });
+    const laptop = await Laptop.findByIdAndDelete(req.params.id); // Zmieniono na findByIdAndDelete
     if (!laptop) {
       return res.status(404).json({ error: 'Laptop nie znaleziony' });
     }
@@ -90,83 +119,6 @@ router.delete('/:serialNumber', authenticate, isAdmin, async (req, res) => {
   }
 });
 
-// Rezerwacja laptopa
-router.post('/:serialNumber/reserve', async (req, res) => {
-  try {
-    const { serialNumber } = req.params;
-    const { startDate, endDate, fullName, email, phone, notes } = req.body;
-
-    // Szukamy laptopa po numerze seryjnym
-    const laptop = await Laptop.findOne({ serialNumber });
-
-    if (!laptop) {
-      return res.status(404).json({ error: 'Laptop nie znaleziony' });
-    }
-
-    if (laptop.isRented) {
-      return res.status(400).json({ error: 'Laptop jest już wypożyczony' });
-    }
-
-    if (laptop.isReserved) {
-      return res.status(400).json({ error: 'Laptop jest już zarezerwowany' });
-    }
-
-    // Tworzymy rezerwację
-    laptop.isReserved = true;
-    laptop.reservation = {
-      startDate,
-      endDate,
-      fullName,
-      email,
-      phone,
-      notes
-    };
-    
-    await laptop.save();
-
-    // Tutaj możesz dodać logikę wysłania potwierdzenia email
-    // np. używając nodemailer
-
-    res.json({
-      message: 'Laptop został pomyślnie zarezerwowany',
-      laptop
-    });
-  } catch (error) {
-    console.error('Błąd rezerwacji laptopa:', error);
-    res.status(500).json({ error: 'Błąd podczas rezerwacji laptopa' });
-  }
-});
-
-// Anulowanie rezerwacji laptopa
-router.put('/:serialNumber/cancel-reservation', async (req, res) => {
-  try {
-    const { serialNumber } = req.params;
-
-    // Szukamy laptopa po numerze seryjnym
-    const laptop = await Laptop.findOne({ serialNumber });
-
-    if (!laptop) {
-      return res.status(404).json({ error: 'Laptop nie znaleziony' });
-    }
-
-    if (!laptop.isReserved) {
-      return res.status(400).json({ error: 'Laptop nie jest zarezerwowany' });
-    }
-
-    // Usuwamy rezerwację
-    laptop.isReserved = false;
-    laptop.reservation = null;
-    
-    await laptop.save();
-
-    res.json({
-      message: 'Rezerwacja została anulowana',
-      laptop
-    });
-  } catch (error) {
-    console.error('Błąd anulowania rezerwacji:', error);
-    res.status(500).json({ error: 'Błąd podczas anulowania rezerwacji' });
-  }
-});
+// Usunięto stare endpointy rezerwacji
 
 module.exports = router;

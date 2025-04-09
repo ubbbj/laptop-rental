@@ -7,6 +7,7 @@ const LaptopList = ({ isAdmin }) => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('brand'); // Default sort by brand
+  const [expandedSpecsId, setExpandedSpecsId] = useState(null); // Stan dla rozwijanej specyfikacji
 
   useEffect(() => {
     setLoading(true);
@@ -48,6 +49,11 @@ const LaptopList = ({ isAdmin }) => {
     }
     return 0;
   });
+
+  // Funkcja do przełączania widoczności specyfikacji
+  const toggleSpecs = (id) => {
+    setExpandedSpecsId(expandedSpecsId === id ? null : id);
+  };
 
   if (loading) {
     return (
@@ -104,9 +110,46 @@ const LaptopList = ({ isAdmin }) => {
                 </div>
               </div>
               
-              <div className="laptop-details">
+              <div className="laptop-image">
+                {/* Wyświetl pierwsze zdjęcie jako miniaturkę, jeśli istnieje */}
+                {laptop.images && laptop.images.length > 0 && (
+                  <img src={laptop.images[0]} alt={`${laptop.brand} ${laptop.model}`} width="100" />
+                )}
+              </div>              <div className="laptop-details">
                 <p><strong>Numer seryjny:</strong> {laptop.serialNumber}</p>
-                {laptop.isRented && <p><strong>Data wypożyczenia:</strong> {new Date(laptop.rentedAt).toLocaleDateString()}</p>}
+                
+                {/* Przycisk do rozwijania specyfikacji i opisu */}
+                {(laptop.description || (laptop.specs && (laptop.specs.cpu || laptop.specs.ram || laptop.specs.disk))) && (
+                  <button
+                    onClick={() => toggleSpecs(laptop._id)}
+                    className="toggle-specs-button"
+                  >
+                    {expandedSpecsId === laptop._id ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}
+                  </button>
+                )}
+                
+                {/* Warunkowe renderowanie opisu i specyfikacji */}
+                {expandedSpecsId === laptop._id && (
+                  <div className="laptop-expanded-details">
+                    {laptop.description && (
+                      <div className="laptop-description">
+                        <strong>Opis:</strong> 
+                        <p>{laptop.description}</p>
+                      </div>
+                    )}
+                      {laptop.specs && (laptop.specs.cpu || laptop.specs.ram || laptop.specs.disk) && (
+                      <div className="laptop-specs expanded">
+                        <strong>Specyfikacja:</strong>
+                        <ul>
+                          {laptop.specs.cpu && <li>CPU: {laptop.specs.cpu}</li>}
+                          {laptop.specs.ram && <li>RAM: {laptop.specs.ram}</li>}
+                          {laptop.specs.disk && <li>Dysk: {laptop.specs.disk}</li>}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
               </div>
               
               <div className="laptop-qr">
@@ -119,12 +162,14 @@ const LaptopList = ({ isAdmin }) => {
                   onClick={async () => {
                     if (window.confirm(`Czy na pewno chcesz usunąć laptop ${laptop.serialNumber}?`)) {
                       try {
-                        await axios.delete(`${process.env.REACT_APP_API_URL}/api/laptops/${laptop.serialNumber}`, {
+                        {/* Poprawiono użycie ID zamiast serialNumber */}
+                        await axios.delete(`${process.env.REACT_APP_API_URL}/api/laptops/${laptop._id}`, {
                           headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`
                           }
                         });
-                        setLaptops(laptops.filter(l => l.serialNumber !== laptop.serialNumber));
+                        // Filtrowanie po _id
+                        setLaptops(laptops.filter(l => l._id !== laptop._id));
                       } catch (error) {
                         console.error('Błąd usuwania laptopa:', error);
                         alert('Nie udało się usunąć laptopa');

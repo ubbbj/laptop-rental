@@ -97,6 +97,71 @@ h2 {
   overflow: hidden;
 }
 
+/* Style dla sekcji ze szczegółami laptopa */
+.laptop-expanded-details {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.laptop-description {
+  margin-bottom: 15px;
+}
+
+.laptop-description strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--secondary);
+  font-size: 0.95rem;
+}
+
+.laptop-description p {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  color: #4a4a4a;
+  font-size: 0.9rem;
+}
+
+.laptop-specs.expanded {
+  margin-top: 10px;
+}
+
+.laptop-specs ul {
+  list-style-type: none;
+  padding-left: 10px;
+  margin-top: 5px;
+}
+
+.laptop-specs ul li {
+  padding: 5px 0;
+  border-bottom: 1px dashed #e0e0e0;
+}
+
+.laptop-specs ul li:last-child {
+  border-bottom: none;
+}
+
+.toggle-specs-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.toggle-specs-button:hover {
+  background-color: var(--primary-dark);
+}
+
 .laptop-card::before {
   content: '';
   position: absolute;
@@ -445,4 +510,55 @@ button:hover {
 .login-required p, .admin-required p {
   margin-bottom: 20px;
   font-size: 18px;
+}
+
+/* Style dla rozwijanej specyfikacji w LaptopList */
+.toggle-specs-button {
+  background: none;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #555;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.toggle-specs-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.laptop-specs.expanded {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+}
+
+/* Dodano style dla obrazka w karcie laptopa */
+.laptop-image img {
+  max-width: 100px; /* Ograniczenie szerokości miniaturki */
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* Dodano style dla opisu */
+.laptop-description {
+  font-size: 14px;
+  color: var(--gray);
+  margin-top: 10px;
+}
+
+/* Dodano style dla listy specyfikacji */
+.laptop-specs ul {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.laptop-specs li {
+  margin-bottom: 3px;
 }

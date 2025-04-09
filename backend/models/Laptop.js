@@ -11,10 +11,18 @@ const ReservationSchema = new mongoose.Schema({
 });
 
 const LaptopSchema = new mongoose.Schema({
-  brand: String,
-  model: String,
-  serialNumber: String,
+  brand: { type: String, required: true },
+  model: { type: String, required: true },
+  serialNumber: { type: String, required: true, unique: true },
   qrCode: String,
+  description: String, // Dodano opis
+  specs: { // Dodano specyfikację
+    cpu: String,
+    ram: String,
+    disk: String,
+    // Można dodać więcej pól specyfikacji w przyszłości
+  },
+  images: [String], // Dodano tablicę URL-i zdjęć
   isRented: { type: Boolean, default: false },
   // Usunięto rentedBy i rentedAt z głównego schematu
   rentalStatus: { type: String, enum: ['pending', 'confirmed'], default: null },
