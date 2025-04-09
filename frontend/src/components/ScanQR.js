@@ -8,16 +8,15 @@ const ScanQR = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const scannerRef = useRef(null);
-  const [showReservationForm, setShowReservationForm] = useState(false);
-  const [reservationData, setReservationData] = useState({
-    startDate: '',
-    endDate: '',
+  const [showRentalForm, setShowRentalForm] = useState(false);
+  const [rentalData, setRentalData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    notes: ''
+    startDate: '', // Dodano startDate
+    endDate: ''    // Dodano endDate
   });
-  const [reservationSuccess, setReservationSuccess] = useState(false);
+  const [rentalSuccess, setRentalSuccess] = useState(false);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -82,65 +81,60 @@ const ScanQR = () => {
     }
   };
 
-  const handleRentLaptop = async () => {
-    if (!laptopInfo) return;
-
-    try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/laptops/${laptopInfo.serialNumber}/rent`);
-      setLaptopInfo({ ...laptopInfo, isRented: true });
-    } catch (err) {
-      console.error("Błąd wypożyczania laptopa:", err);
-      setError("Nie udało się wypożyczyć laptopa.");
-    }
-  };
-
-  const handleReserveLaptop = () => {
-    setShowReservationForm(true);
+  // Zmieniono handleRentLaptop na otwarcie formularza
+  const handleOpenRentalForm = () => {
+    setShowRentalForm(true);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setReservationData({
-      ...reservationData,
+    setRentalData({
+      ...rentalData,
       [name]: value
     });
   };
 
-  const handleReservationSubmit = async (e) => {
+  const handleRentalSubmit = async (e) => {
     e.preventDefault();
     
     if (!laptopInfo) return;
     setLoading(true);
     setError(null);
+    const token = localStorage.getItem('token');
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/laptops/${laptopInfo.serialNumber}/reserve`, {
-        ...reservationData,
-        laptopId: laptopInfo._id
-      });
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/rentals`,
+        {
+          laptopId: laptopInfo._id,
+          ...rentalData
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       
-      setReservationSuccess(true);
-      setShowReservationForm(false);
-      setLaptopInfo({ ...laptopInfo, isReserved: true });
+      setRentalSuccess(true);
+      setShowRentalForm(false);
+      // Aktualizujemy status lokalnie, zakładając, że backend ustawił go na 'pending'
+      setLaptopInfo({ ...laptopInfo, isRented: true, rentalStatus: 'pending' });
     } catch (err) {
-      console.error("Błąd rezerwacji laptopa:", err);
-      setError("Nie udało się zarezerwować laptopa. Spróbuj ponownie.");
+      console.error("Błąd wysyłania wniosku o wypożyczenie:", err);
+      setError("Nie udało się wysłać wniosku o wypożyczenie. Spróbuj ponownie.");
     } finally {
       setLoading(false);
     }
   };
 
-  const cancelReservation = () => {
-    setShowReservationForm(false);
-    setReservationData({
-      startDate: '',
-      endDate: '',
+  const cancelRentalForm = () => {
+    setShowRentalForm(false);
+    setRentalData({
       fullName: '',
       email: '',
       phone: '',
-      notes: ''
+      startDate: '', // Dodano reset dat
+      endDate: ''
     });
   };
+
+  // Usunięto stare funkcje rezerwacji
 
   return (
     <div>
@@ -164,29 +158,31 @@ const ScanQR = () => {
               <div className="laptop-info">
                 <h4>{laptopInfo.brand} {laptopInfo.model}</h4>
                 <p>Numer seryjny: {laptopInfo.serialNumber}</p>
-                <p>Status: {laptopInfo.isRented ? 'Wypożyczony' : (laptopInfo.isReserved ? 'Zarezerwowany' : 'Dostępny')}</p>
+                <p>Status: {laptopInfo.isRented ? (laptopInfo.rentalStatus === 'pending' ? 'Oczekuje na potwierdzenie' : 'Wypożyczony') : 'Dostępny'}</p>
                 
-                {!laptopInfo.isRented && !laptopInfo.isReserved && !showReservationForm && (
+                {/* Przycisk otwiera formularz */}
+                {!laptopInfo.isRented && !showRentalForm && (
                   <div className="laptop-actions">
-                    <button onClick={handleRentLaptop}>Wypożycz teraz</button>
-                    <button onClick={handleReserveLaptop}>Zarezerwuj laptop</button>
+                    <button onClick={handleOpenRentalForm}>Wypożycz teraz</button>
                   </div>
                 )}
 
-                {showReservationForm && (
-                  <div className="reservation-form-container">
-                    <h4>Formularz rezerwacji laptopa</h4>
-                    <form onSubmit={handleReservationSubmit}>
+                {/* Formularz wypożyczenia */}
+                {showRentalForm && (
+                  <div className="rental-form-container"> {/* Zmieniono klasę CSS */}
+                    <h4>Formularz wypożyczenia laptopa</h4>
+                    <form onSubmit={handleRentalSubmit}>
+                      {/* Dodano pola dat */}
                       <div className="form-group">
                         <label htmlFor="startDate">Data rozpoczęcia:</label>
                         <input
                           type="date"
                           id="startDate"
                           name="startDate"
-                          value={reservationData.startDate}
+                          value={rentalData.startDate}
                           onChange={handleInputChange}
                           required
-                          min={new Date().toISOString().split('T')[0]}
+                          min={new Date().toISOString().split('T')[0]} // Minimalna data to dzisiaj
                         />
                       </div>
                       
@@ -196,20 +192,19 @@ const ScanQR = () => {
                           type="date"
                           id="endDate"
                           name="endDate"
-                          value={reservationData.endDate}
+                          value={rentalData.endDate}
                           onChange={handleInputChange}
                           required
-                          min={reservationData.startDate || new Date().toISOString().split('T')[0]}
+                          min={rentalData.startDate || new Date().toISOString().split('T')[0]} // Minimalna data to data rozpoczęcia lub dzisiaj
                         />
                       </div>
-                      
                       <div className="form-group">
                         <label htmlFor="fullName">Imię i nazwisko:</label>
                         <input
                           type="text"
                           id="fullName"
                           name="fullName"
-                          value={reservationData.fullName}
+                          value={rentalData.fullName}
                           onChange={handleInputChange}
                           required
                         />
@@ -221,7 +216,7 @@ const ScanQR = () => {
                           type="email"
                           id="email"
                           name="email"
-                          value={reservationData.email}
+                          value={rentalData.email}
                           onChange={handleInputChange}
                           required
                         />
@@ -233,28 +228,17 @@ const ScanQR = () => {
                           type="tel"
                           id="phone"
                           name="phone"
-                          value={reservationData.phone}
+                          value={rentalData.phone}
                           onChange={handleInputChange}
                           required
                         />
                       </div>
-                      
-                      <div className="form-group">
-                        <label htmlFor="notes">Dodatkowe uwagi:</label>
-                        <textarea
-                          id="notes"
-                          name="notes"
-                          value={reservationData.notes}
-                          onChange={handleInputChange}
-                          rows="3"
-                        ></textarea>
-                      </div>
-                      
+                                            
                       <div className="form-actions">
                         <button type="submit" disabled={loading}>
-                          {loading ? 'Przetwarzanie...' : 'Zarezerwuj'}
+                          {loading ? 'Przetwarzanie...' : 'Wyślij wniosek'}
                         </button>
-                        <button type="button" onClick={cancelReservation}>
+                        <button type="button" onClick={cancelRentalForm}>
                           Anuluj
                         </button>
                       </div>
@@ -262,10 +246,11 @@ const ScanQR = () => {
                   </div>
                 )}
 
-                {reservationSuccess && (
+                {/* Komunikat sukcesu */}
+                {rentalSuccess && (
                   <div className="success-message">
-                    <p>Laptop został pomyślnie zarezerwowany!</p>
-                    <p>Wkrótce otrzymasz potwierdzenie na podany adres email.</p>
+                    <p>Wniosek o wypożyczenie został wysłany!</p>
+                    <p>Administrator wkrótce go rozpatrzy.</p>
                   </div>
                 )}
               </div>
@@ -276,8 +261,8 @@ const ScanQR = () => {
             <button onClick={() => {
               setScanResult('');
               setLaptopInfo(null);
-              setShowReservationForm(false);
-              setReservationSuccess(false);
+              setShowRentalForm(false); // Dodano reset formularza
+              setRentalSuccess(false); // Dodano reset sukcesu
               if (scannerRef.current) {
                 try {
                   scannerRef.current.render(

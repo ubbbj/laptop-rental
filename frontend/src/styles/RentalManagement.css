@@ -1,0 +1,178 @@
+/* Ogólne style dla zarządzania wypożyczeniami */
+.rental-management {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.rental-management h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Filtry */
+.filter-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.filter-controls button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-controls button.active {
+  background-color: #3498db;
+  color: white;
+}
+
+.filter-controls button:hover {
+  background-color: #bdc3c7;
+}
+
+/* Lista wypożyczeń */
+.rentals-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.rental-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.rental-card:hover {
+  transform: translateY(-5px);
+}
+
+.rental-header {
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+.rental-summary h3 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+}
+
+.rental-summary p {
+  margin: 5px 0;
+  color: #7f8c8d;
+}
+
+/* Statusy wypożyczeń */
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badge-pending { /* Zmieniono z active na pending */
+  background-color: #2ecc71;
+  color: white;
+}
+
+.badge-confirmed { /* Zmieniono z ended na confirmed */
+  background-color: #2ecc71; /* Zielony dla potwierdzonych */
+  color: white;
+}
+
+.badge-unknown { /* Dodano styl dla nieznanego statusu */
+  background-color: #95a5a6;
+  color: white;
+}
+
+/* Szczegóły wypożyczenia */
+.rental-details {
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+/* Przyciski akcji */
+.rental-actions {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rental-actions button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-confirm { /* Dodano styl dla przycisku potwierdzenia */
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background-color: #27ae60;
+}
+
+.btn-reject { /* Dodano styl dla przycisku odrzucenia */
+  background-color: #f39c12; /* Pomarańczowy dla odrzucenia */
+  color: white;
+}
+
+.btn-reject:hover {
+  background-color: #e67e22;
+}
+
+.btn-end { /* Przycisk zakończenia pozostaje czerwony */
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-end:hover {
+  background-color: #c0392b;
+}
+
+/* Komunikaty */
+.loading, .error-message, .no-rentals {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
+.no-rentals {
+  color: #7f8c8d;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .rentals-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-controls {
+    flex-direction: column;
+  }
+}

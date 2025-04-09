@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const laptopRoutes = require('./routes/laptops');
 const { router: authRouter, authenticate, isAdmin } = require('./routes/auth');
+const rentalRoutes = require('./routes/rentals');
 
 // Inicjalizacja aplikacji Express
 const app = express();
@@ -51,6 +52,7 @@ app.use('/api/auth', authRouter);
 
 // Używamy laptopRoutes dla wszystkich tras /api/laptops
 app.use('/api/laptops', laptopRoutes);
+app.use('/api/rentals', rentalRoutes);
 
 // Endpoint główny
 app.get('/', (req, res) => res.send('API is running'));
