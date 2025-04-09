@@ -97,6 +97,71 @@ h2 {
   overflow: hidden;
 }
 
+/* Style dla sekcji ze szczegółami laptopa */
+.laptop-expanded-details {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.laptop-description {
+  margin-bottom: 15px;
+}
+
+.laptop-description strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--secondary);
+  font-size: 0.95rem;
+}
+
+.laptop-description p {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  color: #4a4a4a;
+  font-size: 0.9rem;
+}
+
+.laptop-specs.expanded {
+  margin-top: 10px;
+}
+
+.laptop-specs ul {
+  list-style-type: none;
+  padding-left: 10px;
+  margin-top: 5px;
+}
+
+.laptop-specs ul li {
+  padding: 5px 0;
+  border-bottom: 1px dashed #e0e0e0;
+}
+
+.laptop-specs ul li:last-child {
+  border-bottom: none;
+}
+
+.toggle-specs-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.toggle-specs-button:hover {
+  background-color: var(--primary-dark);
+}
+
 .laptop-card::before {
   content: '';
   position: absolute;
@@ -118,13 +183,95 @@ h2 {
   font-weight: 600;
 }
 
+/* Ulepszone style dla obrazków */
+.laptop-image {
+  position: relative;
+  margin: 15px 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.laptop-image:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
+}
+
+.laptop-image img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.laptop-image:hover img {
+  transform: scale(1.08);
+}
+
+.laptop-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.laptop-image:hover::after {
+  opacity: 1;
+}
+
 .laptop-card img {
   display: block;
-  margin: 15px auto;
-  border: 1px solid #e0e0e0;
-  padding: 10px;
-  background-color: var(--white);
   border-radius: 8px;
+}
+
+/* Galeria zdjęć */
+.laptop-gallery {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #f0f0f0;
+}
+
+.laptop-gallery::-webkit-scrollbar {
+  height: 6px;
+}
+
+.laptop-gallery::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.laptop-gallery::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 10px;
+}
+
+.laptop-gallery-thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.laptop-gallery-thumbnail:hover,
+.laptop-gallery-thumbnail.active {
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 
 /* Status Badges */
@@ -445,4 +592,55 @@ button:hover {
 .login-required p, .admin-required p {
   margin-bottom: 20px;
   font-size: 18px;
+}
+
+/* Style dla rozwijanej specyfikacji w LaptopList */
+.toggle-specs-button {
+  background: none;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #555;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.toggle-specs-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.laptop-specs.expanded {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+}
+
+/* Dodano style dla obrazka w karcie laptopa */
+.laptop-image img {
+  max-width: 100px; /* Ograniczenie szerokości miniaturki */
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* Dodano style dla opisu */
+.laptop-description {
+  font-size: 14px;
+  color: var(--gray);
+  margin-top: 10px;
+}
+
+/* Dodano style dla listy specyfikacji */
+.laptop-specs ul {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.laptop-specs li {
+  margin-bottom: 3px;
 }

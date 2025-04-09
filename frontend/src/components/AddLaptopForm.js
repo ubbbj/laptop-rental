@@ -7,7 +7,14 @@ const AddLaptopForm = () => {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    serialNumber: ''
+    serialNumber: '',
+    description: '', // Dodano opis
+    specs: { // Dodano specyfikację
+      cpu: '',
+      ram: '',
+      disk: ''
+    },
+    images: '' // Dodano pole na URL-e zdjęć (jako string)
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -32,6 +39,10 @@ const AddLaptopForm = () => {
     if (!formData.brand.trim()) newErrors.brand = 'Marka jest wymagana';
     if (!formData.model.trim()) newErrors.model = 'Model jest wymagany';
     if (!formData.serialNumber.trim()) newErrors.serialNumber = 'Numer seryjny jest wymagany';
+    // Można dodać walidację dla nowych pól, np.
+    // if (!formData.description.trim()) newErrors.description = 'Opis jest wymagany';
+    // if (!formData.specs.cpu.trim()) newErrors.cpu = 'CPU jest wymagane';
+    // ... itd.
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -39,10 +50,22 @@ const AddLaptopForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    // Obsługa zagnieżdżonych pól specs
+    if (name.startsWith('specs.')) {
+      const specField = name.split('.')[1];
+      setFormData(prevData => ({
+        ...prevData,
+        specs: {
+          ...prevData.specs,
+          [specField]: value
+        }
+      }));
+    } else {
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -53,9 +76,16 @@ const AddLaptopForm = () => {
     
     try {
       setLoading(true);
+      // Przygotowanie danych do wysłania (przetworzenie images)
+      const imagesArray = formData.images.split(/[\n,]+/).map(url => url.trim()).filter(url => url);
+      const dataToSend = {
+        ...formData,
+        images: imagesArray
+      };
+
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/laptops`,
-        formData,
+        dataToSend,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -145,6 +175,68 @@ const AddLaptopForm = () => {
             className={errors.serialNumber ? 'input-error' : ''}
           />
           {errors.serialNumber && <span className="error-text">{errors.serialNumber}</span>}
+        </div>
+
+        {/* Dodano nowe pola formularza */}
+        <div className="form-group">
+          <label htmlFor="description">Opis:</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="3"
+          ></textarea>
+          {/* Można dodać walidację */}
+        </div>
+
+        <fieldset className="form-group specs-group">
+          <legend>Specyfikacja</legend>
+          <div className="form-group">
+            <label htmlFor="specs.cpu">CPU:</label>
+            <input
+              type="text"
+              id="specs.cpu"
+              name="specs.cpu"
+              value={formData.specs.cpu}
+              onChange={handleChange}
+            />
+            {/* Można dodać walidację */}
+          </div>
+          <div className="form-group">
+            <label htmlFor="specs.ram">RAM:</label>
+            <input
+              type="text"
+              id="specs.ram"
+              name="specs.ram"
+              value={formData.specs.ram}
+              onChange={handleChange}
+            />
+            {/* Można dodać walidację */}
+          </div>
+          <div className="form-group">
+            <label htmlFor="specs.disk">Dysk:</label>
+            <input
+              type="text"
+              id="specs.disk"
+              name="specs.disk"
+              value={formData.specs.disk}
+              onChange={handleChange}
+            />
+            {/* Można dodać walidację */}
+          </div>
+        </fieldset>
+
+        <div className="form-group">
+          <label htmlFor="images">Zdjęcia (URL-e, oddzielone przecinkiem lub nową linią):</label>
+          <textarea
+            id="images"
+            name="images"
+            value={formData.images}
+            onChange={handleChange}
+            rows="3"
+          ></textarea>
+          {/* Można dodać walidację */}
         </div>
 
         <button 
