@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import ImageModal from './ImageModal';
+import '../styles/ImageModal.css';
 
 const LaptopList = ({ isAdmin }) => {
   const [laptops, setLaptops] = useState([]);
@@ -8,6 +10,7 @@ const LaptopList = ({ isAdmin }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('brand'); // Default sort by brand
   const [expandedSpecsId, setExpandedSpecsId] = useState(null); // Stan dla rozwijanej specyfikacji
+  const [selectedImage, setSelectedImage] = useState(null); // Stan dla wybranego zdjęcia do powiększenia
 
   useEffect(() => {
     setLoading(true);
@@ -49,10 +52,19 @@ const LaptopList = ({ isAdmin }) => {
     }
     return 0;
   });
-
   // Funkcja do przełączania widoczności specyfikacji
   const toggleSpecs = (id) => {
     setExpandedSpecsId(expandedSpecsId === id ? null : id);
+  };
+
+  // Funkcja do otwierania modalu ze zdjęciem
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+  };
+
+  // Funkcja do zamykania modalu ze zdjęciem
+  const closeImageModal = () => {
+    setSelectedImage(null);
   };
 
   if (loading) {
@@ -69,7 +81,6 @@ const LaptopList = ({ isAdmin }) => {
   if (error) {
     return <div className="error-message">{error}</div>;
   }
-
   return (
     <div>
       <h2>Lista dostępnych laptopów</h2>
@@ -95,6 +106,14 @@ const LaptopList = ({ isAdmin }) => {
         </div>
       </div>
       
+      {selectedImage && (
+        <ImageModal
+          image={selectedImage}
+          altText="Powiększone zdjęcie laptopa"
+          onClose={closeImageModal}
+        />
+      )}
+      
       {sortedLaptops.length === 0 ? (
         <div className="no-results">
           <p>Brak laptopów spełniających kryteria wyszukiwania.</p>
@@ -109,13 +128,15 @@ const LaptopList = ({ isAdmin }) => {
                   {laptop.isRented ? 'Wypożyczony' : 'Dostępny'}
                 </div>
               </div>
-              
-              <div className="laptop-image">
+                <div className="laptop-image" onClick={() => laptop.images && laptop.images.length > 0 && openImageModal(laptop.images[0])}>
                 {/* Wyświetl pierwsze zdjęcie jako miniaturkę, jeśli istnieje */}
                 {laptop.images && laptop.images.length > 0 && (
-                  <img src={laptop.images[0]} alt={`${laptop.brand} ${laptop.model}`} width="100" />
+                  <>
+                    <img src={laptop.images[0]} alt={`${laptop.brand} ${laptop.model}`} />
+                    <div className="zoom-icon"></div>
+                  </>
                 )}
-              </div>              <div className="laptop-details">
+              </div><div className="laptop-details">
                 <p><strong>Numer seryjny:</strong> {laptop.serialNumber}</p>
                 
                 {/* Przycisk do rozwijania specyfikacji i opisu */}

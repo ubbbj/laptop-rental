@@ -183,13 +183,95 @@ h2 {
   font-weight: 600;
 }
 
+/* Ulepszone style dla obrazków */
+.laptop-image {
+  position: relative;
+  margin: 15px 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.laptop-image:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
+}
+
+.laptop-image img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.laptop-image:hover img {
+  transform: scale(1.08);
+}
+
+.laptop-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.laptop-image:hover::after {
+  opacity: 1;
+}
+
 .laptop-card img {
   display: block;
-  margin: 15px auto;
-  border: 1px solid #e0e0e0;
-  padding: 10px;
-  background-color: var(--white);
   border-radius: 8px;
+}
+
+/* Galeria zdjęć */
+.laptop-gallery {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #f0f0f0;
+}
+
+.laptop-gallery::-webkit-scrollbar {
+  height: 6px;
+}
+
+.laptop-gallery::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.laptop-gallery::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 10px;
+}
+
+.laptop-gallery-thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.laptop-gallery-thumbnail:hover,
+.laptop-gallery-thumbnail.active {
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 
 /* Status Badges */
