@@ -43,10 +43,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Usunięto stary endpoint /rent - obsługa wypożyczeń jest w rentals.js
-
-// Pobieranie pojedynczego laptopa po ID lub numerze seryjnym
-// Zmieniono na ID dla spójności z innymi trasami PUT/DELETE
 router.get('/:serialNumber', async (req, res) => {
   try {
     // Można szukać po ID lub serialNumber, tutaj zostawiono serialNumber
@@ -108,7 +104,7 @@ router.put('/:id', authenticate, isAdmin, async (req, res) => {
 // Usuwanie laptopa (tylko dla adminów) - zmieniono na ID
 router.delete('/:serialNumber', authenticate, isAdmin, async (req, res) => {
   try {
-    const laptop = await Laptop.findByIdAndDelete(req.params.id); // Zmieniono na findByIdAndDelete
+    const laptop = await Laptop.findByIdAndDelete(req.params.id); 
     if (!laptop) {
       return res.status(404).json({ error: 'Laptop nie znaleziony' });
     }
@@ -119,6 +115,5 @@ router.delete('/:serialNumber', authenticate, isAdmin, async (req, res) => {
   }
 });
 
-// Usunięto stare endpointy rezerwacji
 
 module.exports = router;

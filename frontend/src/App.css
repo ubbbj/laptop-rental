@@ -1,22 +1,100 @@
 /* Modern Color Palette */
 :root {
+  /* Base Colors */
   --primary: #3498db;
   --primary-dark: #2980b9;
-  --secondary: #2c3e50;
-  --success: #2ecc71;
-  --danger: #e74c3c;
-  --warning: #f39c12;
-  --light: #f8f9fa;
-  --dark: #343a40;
-  --gray: #6c757d;
-  --white: #ffffff;
+  --secondary-base: #2c3e50; /* Renamed from --secondary */
+  --success-base: #2ecc71;   /* Renamed from --success */
+  --danger-base: #e74c3c;    /* Renamed from --danger */
+  --danger-hover-background: #c0392b; /* Added for hover state */
+  --warning-base: #f39c12;   /* Renamed from --warning */
+  --light-base: #f8f9fa;     /* Renamed from --light */
+  --dark-base: #343a40;      /* Renamed from --dark */
+  --gray-base: #6c757d;      /* Renamed from --gray */
+  --white-base: #ffffff;     /* Renamed from --white */
+
+  /* Theme Variables (Light Mode - Default) */
+  --background-color: #f5f7fa;
+  --text-color: var(--dark-base);
+  --card-background: var(--white-base);
+  --nav-background: var(--secondary-base);
+  --nav-text-color: var(--white-base);
+  --primary-text-color: var(--primary);
+  --secondary-text-color: var(--secondary-base);
+  --input-background: #f9f9f9;
+  --input-border: #ddd;
+  --input-focus-background: var(--white-base);
+  --input-focus-border: var(--primary);
+  --button-background: var(--primary);
+  --button-text: var(--white-base);
+  --button-hover-background: var(--primary-dark);
+  --danger-background: var(--danger-base);
+  --danger-text: var(--white-base);
+  --success-background: var(--success-base);
+  --success-text: var(--white-base);
+  --message-error-background: #fdecea;
+  --message-error-text: var(--danger-base);
+  --message-success-background: #e8f7ed;
+  --message-success-text: var(--success-base);
+  --expanded-details-background: var(--light-base);
+  --specs-border: #e0e0e0;
+  --toggle-specs-border: #ccc;
+  --toggle-specs-color: #555;
+  --toggle-specs-hover-background: #f0f0f0;
+  --toggle-specs-hover-color: #333;
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: var(--primary);
+  --no-results-background: var(--light-base);
+  --no-results-text: var(--gray-base);
+  --no-results-border: #ccc;
+  --login-required-background: var(--light-base);
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s ease;
 }
 
+body.dark-mode {
+  --background-color: #1a1a2e;
+  --text-color: #e0e0e0;
+  --card-background: #2a2a3e;
+  --nav-background: #1f1f30;
+  --nav-text-color: #e0e0e0;
+  --primary-text-color: #5fa8d3;
+  --secondary-text-color: #b0b0d0;
+  --input-background: #2a2a3e;
+  --input-border: #4a4a5e;
+  --input-focus-background: #3a3a4e;
+  --input-focus-border: #5fa8d3;
+  --button-background: #5fa8d3;
+  --button-text: #1a1a2e;
+  --button-hover-background: #4a90c2;
+  --danger-background: #e57373;
+  --danger-hover-background: #d32f2f; /* Darker red for dark mode hover */
+  --danger-text: #1a1a2e;
+  --success-background: #81c784;
+  --success-text: #1a1a2e;
+  --message-error-background: #4e2a2e;
+  --message-error-text: #e57373;
+  --message-success-background: #2a4e2e;
+  --message-success-text: #81c784;
+  --expanded-details-background: #2a2a3e;
+  --specs-border: #4a4a5e;
+  --toggle-specs-border: #6a6a7e;
+  --toggle-specs-color: #b0b0d0;
+  --toggle-specs-hover-background: #3a3a4e;
+  --toggle-specs-hover-color: #e0e0e0;
+  --scrollbar-track: #2a2a3e;
+  --scrollbar-thumb: #5fa8d3;
+  --no-results-background: #2a2a3e;
+  --no-results-text: #b0b0d0;
+  --no-results-border: #4a4a5e;
+  --login-required-background: #2a2a3e;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow for dark mode */
+}
+
 body {
-  background-color: #f5f7fa;
-  color: var(--dark);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
 .App {
@@ -28,7 +106,7 @@ body {
 
 /* Modern Navigation */
 nav {
-  background-color: var(--secondary);
+  background-color: var(--nav-background);
   padding: 0;
   border-radius: 8px;
   margin-bottom: 30px;
@@ -42,7 +120,7 @@ nav {
 }
 
 nav a {
-  color: var(--white);
+  color: var(--nav-text-color);
   text-decoration: none;
   font-weight: 500;
   padding: 15px 20px;
@@ -51,13 +129,13 @@ nav a {
 }
 
 nav a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1); /* Keep this for subtle hover on nav */
 }
 
 .logout-button {
   margin-left: auto;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--white);
+  background-color: rgba(255, 255, 255, 0.1); /* Keep this for subtle hover on nav */
+  color: var(--nav-text-color);
   border: none;
   padding: 15px 20px;
   cursor: pointer;
@@ -66,14 +144,15 @@ nav a:hover {
 }
 
 .logout-button:hover {
-  background-color: var(--danger);
+  background-color: var(--danger-background);
+  color: var(--danger-text); /* Ensure text is readable */
 }
 
 /* Headings */
 h2 {
-  color: var(--secondary);
+  color: var(--secondary-text-color);
   margin-bottom: 25px;
-  border-bottom: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary-text-color);
   padding-bottom: 10px;
   font-weight: 600;
 }
@@ -92,7 +171,7 @@ h2 {
   padding: 25px;
   box-shadow: var(--shadow);
   transition: var(--transition);
-  background-color: var(--white);
+  background-color: var(--card-background);
   position: relative;
   overflow: hidden;
 }
@@ -101,9 +180,9 @@ h2 {
 .laptop-expanded-details {
   margin-top: 15px;
   padding: 15px;
-  background-color: #f8f9fa;
+  background-color: var(--expanded-details-background);
   border-radius: 8px;
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid var(--primary-text-color);
   transition: all 0.3s ease;
   font-size: 0.95rem;
 }
@@ -115,7 +194,7 @@ h2 {
 .laptop-description strong {
   display: block;
   margin-bottom: 8px;
-  color: var(--secondary);
+  color: var(--secondary-text-color);
   font-size: 0.95rem;
 }
 
@@ -123,7 +202,7 @@ h2 {
   margin: 0;
   padding: 0;
   line-height: 1.5;
-  color: #4a4a4a;
+  color: var(--text-color); /* Use general text color */
   font-size: 0.9rem;
 }
 
@@ -139,7 +218,7 @@ h2 {
 
 .laptop-specs ul li {
   padding: 5px 0;
-  border-bottom: 1px dashed #e0e0e0;
+  border-bottom: 1px dashed var(--specs-border);
 }
 
 .laptop-specs ul li:last-child {
@@ -147,8 +226,8 @@ h2 {
 }
 
 .toggle-specs-button {
-  background-color: var(--primary);
-  color: white;
+  background-color: var(--button-background);
+  color: var(--button-text);
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
@@ -159,7 +238,7 @@ h2 {
 }
 
 .toggle-specs-button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--button-hover-background);
 }
 
 .laptop-card::before {
@@ -169,7 +248,7 @@ h2 {
   left: 0;
   width: 5px;
   height: 100%;
-  background: var(--primary);
+  background: var(--primary-text-color);
 }
 
 .laptop-card:hover {
@@ -179,36 +258,35 @@ h2 {
 
 .laptop-card h3 {
   margin-top: 0;
-  color: var(--primary);
+  color: var(--primary-text-color);
   font-weight: 600;
 }
 
-/* Ulepszone style dla obrazków */
+/* Usunięcie obramowania i poprawa stylu obrazków laptopów */
 .laptop-image {
   position: relative;
-  margin: 15px 0;
+  margin: 15px auto;
   overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-  background-color: #f9f9f9;
-  transition: all 0.3s ease;
-}
-
-.laptop-image:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
+  border-radius: 0; /* Usunięcie zaokrąglonych rogów */
+  box-shadow: none; /* Usunięcie cienia */
+  background-color: transparent; /* Usunięcie tła */
+  transition: transform 0.3s ease;
+  max-width: 200px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .laptop-image img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.5s ease;
-  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
 .laptop-image:hover img {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .laptop-image::after {
@@ -218,7 +296,7 @@ h2 {
   left: 0;
   width: 100%;
   height: 30%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -240,7 +318,7 @@ h2 {
   overflow-x: auto;
   padding-bottom: 5px;
   scrollbar-width: thin;
-  scrollbar-color: var(--primary) #f0f0f0;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 .laptop-gallery::-webkit-scrollbar {
@@ -248,12 +326,12 @@ h2 {
 }
 
 .laptop-gallery::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: var(--scrollbar-track);
   border-radius: 10px;
 }
 
 .laptop-gallery::-webkit-scrollbar-thumb {
-  background-color: var(--primary);
+  background-color: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
@@ -270,7 +348,7 @@ h2 {
 
 .laptop-gallery-thumbnail:hover,
 .laptop-gallery-thumbnail.active {
-  border-color: var(--primary);
+  border-color: var(--primary-text-color);
   transform: translateY(-2px);
 }
 
@@ -285,13 +363,13 @@ h2 {
 }
 
 .status-available {
-  background-color: var(--success);
-  color: var(--white);
+  background-color: var(--success-background);
+  color: var(--success-text);
 }
 
 .status-rented {
-  background-color: var(--danger);
-  color: var(--white);
+  background-color: var(--danger-background);
+  color: var(--danger-text);
 }
 
 /* QR Scanner */
@@ -299,7 +377,7 @@ h2 {
   max-width: 500px;
   margin: 0 auto;
   padding: 25px;
-  background-color: var(--white);
+  background-color: var(--card-background); /* Use card background for consistency */
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
@@ -307,15 +385,15 @@ h2 {
 .scan-result {
   margin-top: 20px;
   padding: 15px;
-  background-color: var(--light);
+  background-color: var(--expanded-details-background); /* Use expanded details background */
   border-radius: 10px;
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid var(--primary-text-color);
 }
 
 /* Buttons */
 button {
-  background-color: var(--primary);
-  color: var(--white);
+  background-color: var(--button-background);
+  color: var(--button-text);
   border: none;
   padding: 12px 20px;
   border-radius: 50px;
@@ -328,7 +406,7 @@ button {
 }
 
 button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--button-hover-background);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -337,7 +415,7 @@ button:hover {
   max-width: 450px;
   margin: 0 auto;
   padding: 30px 35px;
-  background-color: var(--white);
+  background-color: var(--card-background); /* Use card background for forms */
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
@@ -350,34 +428,57 @@ button:hover {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--secondary);
+  color: var(--secondary-text-color);
   font-size: 15px;
 }
 
 .form-group input {
   width: 94%;
   padding: 12px 15px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   transition: var(--transition);
   font-size: 15px;
-  background-color: #f9f9f9;
+  background-color: var(--input-background);
+  color: var(--text-color); /* Ensure input text color matches theme */
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .form-group input:focus {
-  border-color: var(--primary);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2), inset 0 1px 3px rgba(0,0,0,0.05); /* Keep shadow for focus indication */
+  outline: none;
+  background-color: var(--input-focus-background);
+}
+
+.form-group textarea {
+  width: 94%; /* Dopasowanie do input */
+  padding: 12px 15px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  transition: var(--transition);
+  font-size: 15px;
+  background-color: var(--input-background);
+  color: var(--text-color); /* Zapewnienie koloru tekstu z motywu */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  font-family: inherit; /* Dziedziczenie czcionki */
+  resize: vertical; /* Pozwolenie tylko na zmianę wysokości */
+  min-height: 80px; /* Minimalna wysokość */
+}
+
+.form-group textarea:focus {
+  border-color: var(--input-focus-border);
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2), inset 0 1px 3px rgba(0,0,0,0.05);
   outline: none;
-  background-color: var(--white);
+  background-color: var(--input-focus-background);
 }
 
 .input-error {
-  border-color: var(--danger) !important;
+  border-color: var(--danger-base) !important; /* Use base danger color for error border */
 }
 
 .error-text {
-  color: var(--danger);
+  color: var(--danger-base); /* Use base danger color for error text */
   font-size: 14px;
   margin-top: 5px;
   display: block;
@@ -385,22 +486,22 @@ button:hover {
 
 /* Message Styles */
 .error-message {
-  background-color: #fdecea;
-  color: var(--danger);
+  background-color: var(--message-error-background);
+  color: var(--message-error-text);
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border-left: 4px solid var(--danger);
+  border-left: 4px solid var(--danger-base); /* Use base danger color for border */
   font-weight: 500;
 }
 
 .success-message {
-  background-color: #e8f7ed;
-  color: var(--success);
+  background-color: var(--message-success-background);
+  color: var(--message-success-text);
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border-left: 4px solid var(--success);
+  border-left: 4px solid var(--success-base); /* Use base success color for border */
   font-weight: 500;
 }
 
@@ -415,7 +516,7 @@ button:hover {
 }
 
 .submit-button:disabled {
-  background-color: var(--gray);
+  background-color: var(--gray-base); /* Use base gray for disabled */
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -423,8 +524,8 @@ button:hover {
 
 /* Delete Button */
 .delete-button {
-  background-color: var(--danger);
-  color: var(--white);
+  background-color: var(--danger-background);
+  color: var(--danger-text);
   border: none;
   padding: 8px 16px;
   border-radius: 50px;
@@ -434,7 +535,7 @@ button:hover {
 }
 
 .delete-button:hover {
-  background-color: #c0392b;
+  background-color: var(--danger-hover-background); /* Use variable for hover */
 }
 
 /* Responsive Design */
@@ -483,7 +584,7 @@ button:hover {
   height: 50px;
   border: 3px solid rgba(0,0,0,0.1);
   border-radius: 50%;
-  border-top-color: var(--primary);
+  border-top-color: var(--primary-text-color);
   animation: spin 1s ease-in-out infinite;
   margin-bottom: 15px;
 }
@@ -510,16 +611,19 @@ button:hover {
 .search-input {
   padding: 12px 15px;
   width: 100%;
-  border: 1px solid #ddd;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background); /* Add background for search input */
+  color: var(--text-color); /* Add text color for search input */
   border-radius: 8px;
   font-size: 16px;
   transition: var(--transition);
 }
 
 .search-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); /* Keep focus shadow */
   outline: none;
+  background-color: var(--input-focus-background); /* Add focus background */
 }
 
 .sort-box {
@@ -530,26 +634,28 @@ button:hover {
 
 .sort-select {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
-  background-color: white;
+  background-color: var(--input-background); /* Use input background */
+  color: var(--text-color); /* Add text color */
   transition: var(--transition);
 }
 
 .sort-select:focus {
-  border-color: var(--primary);
+  border-color: var(--input-focus-border);
   outline: none;
+  background-color: var(--input-focus-background); /* Add focus background */
 }
 
 /* No results message */
 .no-results {
-  background-color: var(--light);
+  background-color: var(--no-results-background);
   padding: 30px;
   border-radius: 8px;
   text-align: center;
   font-size: 18px;
-  color: var(--gray);
-  border: 1px dashed #ccc;
+  color: var(--no-results-text);
+  border: 1px dashed var(--no-results-border);
 }
 
 /* Laptop card improvements */
@@ -575,13 +681,14 @@ button:hover {
 }
 
 .laptop-card.rented::before {
-  background-color: var(--danger);
+  background-color: var(--danger-background); /* Use theme-aware danger background */
 }
 
 /* Login and Register forms */
 .login-required, .admin-required {
   text-align: center;
-  background-color: var(--light);
+  background-color: var(--login-required-background);
+  color: var(--text-color); /* Ensure text is readable */
   padding: 40px 20px;
   border-radius: 8px;
   max-width: 500px;
@@ -596,26 +703,26 @@ button:hover {
 
 /* Style dla rozwijanej specyfikacji w LaptopList */
 .toggle-specs-button {
-  background: none;
-  border: 1px solid #ccc;
+  background: transparent; /* Explicitly set background */
+  border: 1px solid var(--toggle-specs-border);
   padding: 5px 10px;
   margin-top: 10px;
   cursor: pointer;
   border-radius: 4px;
   font-size: 12px;
-  color: #555;
+  color: var(--toggle-specs-color);
   transition: background-color 0.2s, color 0.2s;
 }
 
 .toggle-specs-button:hover {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: var(--toggle-specs-hover-background);
+  color: var(--toggle-specs-hover-color);
 }
 
 .laptop-specs.expanded {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px dashed #eee;
+  border-top: 1px dashed var(--specs-border);
 }
 
 /* Dodano style dla obrazka w karcie laptopa */
@@ -629,7 +736,7 @@ button:hover {
 /* Dodano style dla opisu */
 .laptop-description {
   font-size: 14px;
-  color: var(--gray);
+  color: var(--text-color); /* Use general text color */
   margin-top: 10px;
 }
 

@@ -4,10 +4,11 @@
   margin: 0 auto;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color); /* Dodano domyślny kolor tekstu */
 }
 
 .rental-management h2 {
-  color: #2c3e50;
+  color: var(--secondary-text-color); /* Zmienna */
   margin-bottom: 20px;
   text-align: center;
 }
@@ -22,21 +23,23 @@
 
 .filter-controls button {
   padding: 8px 16px;
-  border: none;
+  border: 1px solid var(--input-border); /* Dodano subtelne obramowanie */
   border-radius: 4px;
-  background-color: #ecf0f1;
-  color: #2c3e50;
+  background-color: var(--input-background); /* Zmienna */
+  color: var(--text-color); /* Zmieniono z --secondary-text-color dla lepszego kontrastu */
   cursor: pointer;
-  transition: all 0.3s;
+  transition: var(--transition);
 }
 
 .filter-controls button.active {
-  background-color: #3498db;
-  color: white;
+  background-color: var(--primary); /* Zmienna */
+  color: var(--button-text); /* Zmienna (tekst na tle primary) */
+  border-color: var(--primary); /* Dopasowanie koloru ramki */
 }
 
-.filter-controls button:hover {
-  background-color: #bdc3c7;
+.filter-controls button:hover:not(.active) { /* Dodano :not(.active) */
+  background-color: var(--input-focus-background); /* Zmienna (subtelny hover) */
+  border-color: var(--input-focus-border);
 }
 
 /* Lista wypożyczeń */
@@ -47,15 +50,18 @@
 }
 
 .rental-card {
-  background: white;
+  background: var(--card-background); /* Zmienna */
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow); /* Zmienna */
   overflow: hidden;
-  transition: transform 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s; /* Dodano transition dla shadow */
+  border: 1px solid var(--input-border); /* Zmienna */
 }
 
 .rental-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* Lekko wzmocniony cień przy hover */
+  /* W trybie ciemnym cień może wymagać innego dostosowania, ale na razie zostawiamy tak */
 }
 
 .rental-header {
@@ -64,17 +70,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f8f9fa;
+  background-color: var(--expanded-details-background); /* Zmienna */
+  border-bottom: 1px solid var(--input-border); /* Zmienna */
 }
 
 .rental-summary h3 {
   margin: 0 0 5px 0;
-  color: #2c3e50;
+  color: var(--secondary-text-color); /* Zmienna */
 }
 
 .rental-summary p {
   margin: 5px 0;
-  color: #7f8c8d;
+  color: var(--gray-base); /* Zmienna */
+  font-size: 0.9em; /* Lekko zmniejszono dla hierarchii */
 }
 
 /* Statusy wypożyczeń */
@@ -86,25 +94,22 @@
   text-transform: uppercase;
 }
 
-.badge-pending { /* Zmieniono z active na pending */
-  background-color: #2ecc71;
-  color: white;
+.badge-pending,
+.badge-confirmed {
+  background-color: var(--success-base); /* Zmienna */
+  color: var(--success-text); /* Zmienna */
 }
 
-.badge-confirmed { /* Zmieniono z ended na confirmed */
-  background-color: #2ecc71; /* Zielony dla potwierdzonych */
-  color: white;
-}
-
-.badge-unknown { /* Dodano styl dla nieznanego statusu */
-  background-color: #95a5a6;
-  color: white;
+.badge-unknown {
+  background-color: var(--gray-base); /* Zmienna */
+  color: var(--white-base); /* Zmienna (założenie, że szary jest wystarczająco ciemny) */
+  /* Można by dodać --gray-text jeśli istnieje */
 }
 
 /* Szczegóły wypożyczenia */
 .rental-details {
   padding: 15px;
-  border-top: 1px solid #eee;
+  background-color: var(--card-background); /* Upewnienie się, że tło jest spójne */
 }
 
 /* Przyciski akcji */
@@ -121,34 +126,37 @@
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.3s;
+  transition: var(--transition);
 }
 
-.btn-confirm { /* Dodano styl dla przycisku potwierdzenia */
-  background-color: #2ecc71;
-  color: white;
+.btn-confirm {
+  background-color: var(--success-base); /* Zmienna */
+  color: var(--success-text); /* Zmienna */
 }
 
 .btn-confirm:hover {
-  background-color: #27ae60;
+  background-color: var(--success-base); /* Zmienna */
+  filter: brightness(90%); /* Przyciemnienie dla hover */
 }
 
-.btn-reject { /* Dodano styl dla przycisku odrzucenia */
-  background-color: #f39c12; /* Pomarańczowy dla odrzucenia */
-  color: white;
+.btn-reject {
+  background-color: var(--warning-base); /* Zmienna */
+  color: var(--white-base); /* Zmienna (założenie, że warning jest ciemny) */
+  /* Można by dodać --warning-text jeśli istnieje */
 }
 
 .btn-reject:hover {
-  background-color: #e67e22;
+  background-color: var(--warning-base); /* Zmienna */
+  filter: brightness(90%); /* Przyciemnienie dla hover */
 }
 
-.btn-end { /* Przycisk zakończenia pozostaje czerwony */
-  background-color: #e74c3c;
-  color: white;
+.btn-end {
+  background-color: var(--danger-base); /* Zmienna */
+  color: var(--danger-text); /* Zmienna */
 }
 
 .btn-end:hover {
-  background-color: #c0392b;
+  background-color: var(--danger-hover-background); /* Zmienna */
 }
 
 /* Komunikaty */
@@ -156,14 +164,16 @@
   text-align: center;
   padding: 20px;
   font-size: 18px;
+  color: var(--gray-base); /* Zmienna */
 }
 
 .error-message {
-  color: #e74c3c;
-}
-
-.no-rentals {
-  color: #7f8c8d;
+  color: var(--danger-base); /* Zmienna */
+  background-color: var(--message-error-background); /* Dodano tło dla lepszej widoczności */
+  border-left: 4px solid var(--danger-base);
+  border-radius: 4px;
+  padding: 10px 15px;
+  text-align: left;
 }
 
 /* Responsywność */
@@ -171,7 +181,7 @@
   .rentals-list {
     grid-template-columns: 1fr;
   }
-  
+
   .filter-controls {
     flex-direction: column;
   }

@@ -13,23 +13,18 @@ const ScanQR = () => {
     fullName: '',
     email: '',
     phone: '',
-    startDate: '', // Dodano startDate
-    endDate: ''    // Dodano endDate
+    startDate: '',
+    endDate: ''
   });
   const [rentalSuccess, setRentalSuccess] = useState(false);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
+    const startScanner = () => {
       const qrElement = document.getElementById("qr-reader");
-      if (!qrElement) {
-        console.error("Element #qr-reader nie istnieje w DOM");
-        return;
-      }
-
-      if (!scannerRef.current) {
+      if (qrElement && !scannerRef.current) {
         try {
-          const scanner = new Html5QrcodeScanner("qr-reader", { 
-            fps: 10, 
+          const scanner = new Html5QrcodeScanner("qr-reader", {
+            fps: 10,
             qrbox: 250,
             rememberLastUsedCamera: true,
           });
@@ -38,10 +33,12 @@ const ScanQR = () => {
             (decodedText) => {
               setScanResult(decodedText);
               fetchLaptopInfo(decodedText);
-              scanner.clear();
+              if (scannerRef.current) {
+                 scannerRef.current.clear().catch(err => console.error("Błąd czyszczenia po skanie:", err));
+                 scannerRef.current = null;
+              }
             },
             (error) => {
-              console.warn("Błąd skanowania:", error);
             }
           );
           
@@ -51,19 +48,27 @@ const ScanQR = () => {
           setError("Nie udało się zainicjalizować skanera QR. Sprawdź uprawnienia kamery.");
         }
       }
-    }, 100);
-    
+    };
+
+    if (!scanResult) {
+       const timeoutId = setTimeout(startScanner, 100);
+       return () => clearTimeout(timeoutId);
+    }
+
     return () => {
-      clearTimeout(timeoutId);
       if (scannerRef.current) {
-        try {
-          scannerRef.current.clear();
-        } catch (error) {
-          console.error("Błąd przy czyszczeniu skanera:", error);
-        }
+        scannerRef.current.clear()
+          .then(() => {
+            scannerRef.current = null; // Resetujemy ref po wyczyszczeniu
+            console.log("Skaner wyczyszczony.");
+          })
+          .catch(error => {
+            console.error("Błąd przy czyszczeniu skanera w cleanup:", error);
+            scannerRef.current = null; // Resetujemy ref nawet jeśli czyszczenie zawiodło
+          });
       }
     };
-  }, []);
+  }, [scanResult]); // Uruchom ponownie, gdy zmieni się scanResult
 
   const fetchLaptopInfo = async (url) => {
     setLoading(true);
@@ -81,7 +86,6 @@ const ScanQR = () => {
     }
   };
 
-  // Zmieniono handleRentLaptop na otwarcie formularza
   const handleOpenRentalForm = () => {
     setShowRentalForm(true);
   };
@@ -113,7 +117,6 @@ const ScanQR = () => {
       
       setRentalSuccess(true);
       setShowRentalForm(false);
-      // Aktualizujemy status lokalnie, zakładając, że backend ustawił go na 'pending'
       setLaptopInfo({ ...laptopInfo, isRented: true, rentalStatus: 'pending' });
     } catch (err) {
       console.error("Błąd wysyłania wniosku o wypożyczenie:", err);
@@ -129,12 +132,10 @@ const ScanQR = () => {
       fullName: '',
       email: '',
       phone: '',
-      startDate: '', // Dodano reset dat
+      startDate: '',
       endDate: ''
     });
   };
-
-  // Usunięto stare funkcje rezerwacji
 
   return (
     <div>
@@ -258,27 +259,14 @@ const ScanQR = () => {
               <p>Nie znaleziono informacji o laptopie.</p>
             )}
             
+            {/* Zmodyfikowano onClick - tylko resetuje stany */}
             <button onClick={() => {
               setScanResult('');
               setLaptopInfo(null);
-              setShowRentalForm(false); // Dodano reset formularza
-              setRentalSuccess(false); // Dodano reset sukcesu
-              if (scannerRef.current) {
-                try {
-                  scannerRef.current.render(
-                    (decodedText) => {
-                      setScanResult(decodedText);
-                      fetchLaptopInfo(decodedText);
-                      scannerRef.current.clear();
-                    },
-                    (error) => {
-                      console.warn("Błąd skanowania:", error);
-                    }
-                  );
-                } catch (error) {
-                  console.error("Błąd przy ponownym uruchamianiu skanera:", error);
-                }
-              }
+              setShowRentalForm(false);
+              setRentalSuccess(false);
+              setError(null); // Dodano reset błędu
+              // Usunięto próbę ponownego renderowania skanera - zajmie się tym useEffect
             }}>
               Skanuj ponownie
             </button>

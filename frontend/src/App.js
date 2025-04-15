@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, Navigate } from 'react-router-dom';
 import LaptopList from './components/LaptopList';
 import ScanQR from './components/ScanQR';
@@ -6,7 +6,7 @@ import AddLaptopForm from './components/AddLaptopForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import RentalManagement from './components/RentalManagement';
-import { useEffect, useState } from 'react';
+// Removed duplicate import
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
 
@@ -15,6 +15,11 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const location = useLocation();
+  const [theme, setTheme] = useState(() => {
+    // Get theme from localStorage or default to 'light'
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -32,7 +37,18 @@ const App = () => {
       setIsAdmin(false);
       setIsLoggedIn(false);
     }
-  }, [location]);
+  }, [location]); // Keep this useEffect for auth check
+
+  // Effect to apply theme class to body and save to localStorage
+  useEffect(() => {
+    document.body.classList.remove('light-mode', 'dark-mode'); // Remove previous classes
+    document.body.classList.add(`${theme}-mode`);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -67,7 +83,15 @@ const App = () => {
           {isLoggedIn ? (
             <>
               <span style={{color: 'white', marginLeft: 'auto', padding: '15px 10px'}}>
-                <span role="img" aria-label="user">👤</span> {username}
+                {isAdmin ? (
+                  <>
+                    <span role="img" aria-label="admin">🛡️</span> Admin
+                  </>
+                ) : (
+                  <>
+                    <span role="img" aria-label="user">👤</span> Użytkownik
+                  </>
+                )}
               </span>
               <button onClick={handleLogout} className="logout-button">
                 <span role="img" aria-label="logout">🚪</span> Wyloguj
@@ -83,8 +107,18 @@ const App = () => {
               </Link>
             </>
           )}
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="theme-toggle-button"
+            style={{ marginLeft: isLoggedIn ? '10px' : 'auto', marginRight: '10px', padding: '10px 15px', background: 'rgba(255, 255, 255, 0.2)', border: 'none', color: 'white', borderRadius: '5px', cursor: 'pointer' }}
+            aria-label={`Przełącz na tryb ${theme === 'light' ? 'ciemny' : 'jasny'}`}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
         </div>
-      </nav>      <main>
+      </nav>
+      <main>
         <Routes>
           <Route path="/" element={<LaptopList isAdmin={isAdmin} />} />
           <Route path="/add" element={isAdmin ? <AddLaptopForm /> : <Navigate to="/" />} />
