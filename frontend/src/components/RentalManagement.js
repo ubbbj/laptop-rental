@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/RentalManagement.css';
+import RentalHistory from './RentalHistory'; // Import RentalHistory
 
 const RentalManagement = () => {
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all'); // all, active, past
+  const [filter, setFilter] = useState('all'); // all, pending, confirmed, history
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
-    fetchRentals();
-  }, []);
+    // Fetch active rentals only when the filter is not 'history'
+    if (filter !== 'history') {
+      fetchRentals();
+    }
+    // No need to fetch active rentals if viewing history
+  }, [filter]); // Re-fetch when filter changes (unless it's history)
 
   const fetchRentals = async () => {
     setLoading(true);
@@ -97,18 +102,17 @@ const RentalManagement = () => {
     }
   };
 
-  // Filtrowanie wypożyczeń
+  // Filtrowanie wypożyczeń - bez zmian, bo dotyczy tylko aktywnych
   const filteredRentals = () => {
     if (filter === 'all') return rentals;
-    // Zmieniono filtr 'pending', aby obejmował także status null (traktowane jako oczekujące)
     if (filter === 'pending') {
       return rentals.filter(rental => rental.isRented && rental.rentalStatus !== 'confirmed');
     }
     if (filter === 'confirmed') {
       return rentals.filter(rental => rental.isRented && rental.rentalStatus === 'confirmed');
     }
-    // Filtr 'past' może wymagać osobnego endpointu lub pobierania z historii
-    return rentals;
+    // If filter is 'history', this function won't be used for rendering the list
+    return []; 
   };
 
   // Uproszczono logikę getStatusBadge
@@ -138,102 +142,95 @@ const RentalManagement = () => {
     return date.toLocaleDateString('pl-PL');
   };
 
-  if (loading) return <div className="loading">Ładowanie wypożyczeń...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-
   return (
-    <div className="rental-management">
+    <div className="rental-management-container">
       <h2>Zarządzanie wypożyczeniami</h2>
-      
-      <div className="filter-controls">
-        <button 
-          className={filter === 'all' ? 'active' : ''} 
-          onClick={() => setFilter('all')}
-        >
-          Wszystkie
-        </button>
-        <button
-          className={filter === 'pending' ? 'active' : ''}
-          onClick={() => setFilter('pending')}
-        >
-          Oczekujące
-        </button>
-        <button
-          className={filter === 'confirmed' ? 'active' : ''}
-          onClick={() => setFilter('confirmed')}
-        >
-          Potwierdzone
-        </button>
-        {/* Można dodać filtr 'Zakończone' jeśli będzie endpoint do historii */}
+
+      <div className="filter-controls"> 
+        <button onClick={() => setFilter('all')} className={filter === 'all' ? 'active' : ''}>Wszystkie</button>
+        <button onClick={() => setFilter('pending')} className={filter === 'pending' ? 'active' : ''}>Oczekujące</button>
+        <button onClick={() => setFilter('confirmed')} className={filter === 'confirmed' ? 'active' : ''}>Potwierdzone</button>
+        <button onClick={() => setFilter('history')} className={filter === 'history' ? 'active' : ''}>Historia</button>
       </div>
-      
-      {filteredRentals().length === 0 ? (
-        <p className="no-rentals">Brak wypożyczeń do wyświetlenia.</p>
-      ) : (
-        <div className="rentals-list">
-          {filteredRentals().map(rental => (
-            <div key={rental._id} className="rental-card">
-              <div className="rental-header" onClick={() => toggleExpand(rental._id)}>
-                <div className="rental-summary">
-                  <h3>{rental.brand} {rental.model}</h3>
-                  <p>Nr seryjny: {rental.serialNumber || 'Brak'}</p>
-                  {/* Dodano serialNumber */}
-                  {/* Usunięto dane wnioskującego z nagłówka */}
-                </div>
-                <div className="rental-status">
-                  {getStatusBadge(rental)}
-                </div>
-              </div>
-              
-              {expandedId === rental._id && (
-                <div className="rental-details">
-                  {/* Wyświetlanie danych klienta */}
-                  {rental.rentalDetails && (
-                    <div className="client-info">
-                      <h4>Dane klienta</h4>
-                      <p><strong>Imię i nazwisko:</strong> {rental.rentalDetails.fullName}</p>
-                      <p><strong>Email:</strong> {rental.rentalDetails.email}</p>
-                      <p><strong>Telefon:</strong> {rental.rentalDetails.phone}</p>
-                      {/* Dodano wyświetlanie dat */}
-                      <p><strong>Okres:</strong> {formatDate(rental.rentalDetails.startDate)} - {formatDate(rental.rentalDetails.endDate)}</p>
-                      <p><strong>Data wniosku:</strong> {formatDate(rental.rentalDetails.rentedAt)}</p>
+
+      {error && <div className="error-message">{error}</div>}
+
+      {/* Warunkowe renderowanie: lista aktywnych LUB historia */}
+      {filter !== 'history' ? (
+        <>
+          {loading ? (
+            <div className="loading">Ładowanie wypożyczeń...</div>
+          ) : filteredRentals().length === 0 ? (
+            <p>Brak wypożyczeń pasujących do filtra.</p>
+          ) : (
+            <ul className="rental-list">
+              {filteredRentals().map(rental => (
+                <li key={rental._id} className={`rental-item ${expandedId === rental._id ? 'expanded' : ''}`}>
+                  <div className="rental-header" onClick={() => toggleExpand(rental._id)}>
+                    <div className="rental-summary">
+                      <h3>{rental.brand} {rental.model}</h3>
+                      <p>Nr seryjny: {rental.serialNumber || 'Brak'}</p>
+                      {/* Dodano serialNumber */}
+                      {/* Usunięto dane wnioskującego z nagłówka */}
+                    </div>
+                    <div className="rental-status">
+                      {getStatusBadge(rental)}
+                    </div>
+                  </div>
+                  
+                  {expandedId === rental._id && (
+                    <div className="rental-details">
+                      {/* Wyświetlanie danych klienta */}
+                      {rental.rentalDetails && (
+                        <div className="client-info">
+                          <h4>Dane klienta</h4>
+                          <p><strong>Imię i nazwisko:</strong> {rental.rentalDetails.fullName}</p>
+                          <p><strong>Email:</strong> {rental.rentalDetails.email}</p>
+                          <p><strong>Telefon:</strong> {rental.rentalDetails.phone}</p>
+                          {/* Dodano wyświetlanie dat */}
+                          <p><strong>Okres:</strong> {formatDate(rental.rentalDetails.startDate)} - {formatDate(rental.rentalDetails.endDate)}</p>
+                          <p><strong>Data wniosku:</strong> {formatDate(rental.rentalDetails.rentedAt)}</p>
+                        </div>
+                      )}
+                      
+                      <div className="rental-actions">
+                        {/* Przyciski dla statusu 'pending' */}
+                        {/* Zmieniono warunek: pokaż przyciski, jeśli wypożyczenie jest aktywne i niepotwierdzone */}
+                        {rental.isRented && rental.rentalStatus !== 'confirmed' && (
+                          <>
+                            <button
+                              className="btn-confirm"
+                              onClick={() => handleConfirmRental(rental._id)}
+                            >
+                              Potwierdź
+                            </button>
+                            <button
+                              className="btn-reject" // Dodano klasę dla odrzucenia
+                              onClick={() => handleRejectRental(rental._id)}
+                            >
+                              Odrzuć
+                            </button>
+                          </>
+                        )}
+                        {/* Przycisk dla statusu 'confirmed' */}
+                        {rental.isRented && rental.rentalStatus === 'confirmed' && (
+                          <button
+                            className="btn-end"
+                            onClick={() => handleEndRental(rental._id)}
+                          >
+                            Zakończ wypożyczenie
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
-                  
-                  <div className="rental-actions">
-                    {/* Przyciski dla statusu 'pending' */}
-                    {/* Zmieniono warunek: pokaż przyciski, jeśli wypożyczenie jest aktywne i niepotwierdzone */}
-                    {rental.isRented && rental.rentalStatus !== 'confirmed' && (
-                      <>
-                        <button
-                          className="btn-confirm"
-                          onClick={() => handleConfirmRental(rental._id)}
-                        >
-                          Potwierdź
-                        </button>
-                        <button
-                          className="btn-reject" // Dodano klasę dla odrzucenia
-                          onClick={() => handleRejectRental(rental._id)}
-                        >
-                          Odrzuć
-                        </button>
-                      </>
-                    )}
-                    {/* Przycisk dla statusu 'confirmed' */}
-                    {rental.isRented && rental.rentalStatus === 'confirmed' && (
-                      <button
-                        className="btn-end"
-                        onClick={() => handleEndRental(rental._id)}
-                      >
-                        Zakończ wypożyczenie
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      ) : (
+        <RentalHistory /> /* Renderuj historię tylko gdy filtr to 'history' */
       )}
     </div>
   );

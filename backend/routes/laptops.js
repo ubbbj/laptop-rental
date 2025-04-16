@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose'); // Dodano import mongoose
 const QRCode = require('qrcode');
 const Laptop = require('../models/Laptop');
 const router = express.Router();
@@ -10,7 +11,9 @@ router.post('/', authenticate, isAdmin, async (req, res) => {
     // Dodano nowe pola
     const { brand, model, serialNumber, description, specs, images } = req.body;
     
-    const qrData = `https://twoja-aplikacja.com/laptop/${serialNumber}`;
+    // Use the frontend URL structure
+    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'; // Use env variable or default
+    const qrData = `${frontendBaseUrl}/laptop/serial/${serialNumber}`;
     const qrCode = await QRCode.toDataURL(qrData);
 
     // Dodano nowe pola do tworzonego obiektu
@@ -43,7 +46,27 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:serialNumber', async (req, res) => {
+// Pobieranie pojedynczego laptopa po ID
+router.get('/:id', async (req, res) => {
+  try {
+    // Sprawdzenie czy ID jest poprawnym ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: 'Nieprawidłowe ID laptopa' });
+    }
+
+    const laptop = await Laptop.findById(req.params.id);
+    if (!laptop) {
+      return res.status(404).json({ error: 'Laptop nie znaleziony' });
+    }
+    res.json(laptop);
+  } catch (error) {
+    console.error('Błąd podczas pobierania laptopa po ID:', error);
+    res.status(500).json({ error: 'Błąd serwera podczas pobierania laptopa' });
+  }
+});
+
+// Pobieranie pojedynczego laptopa po numerze seryjnym (może być przydatne np. dla QR kodów)
+router.get('/serial/:serialNumber', async (req, res) => { // Zmieniono ścieżkę, aby uniknąć konfliktu z /:id
   try {
     // Można szukać po ID lub serialNumber, tutaj zostawiono serialNumber
     const laptop = await Laptop.findOne({ serialNumber: req.params.serialNumber });
@@ -52,8 +75,8 @@ router.get('/:serialNumber', async (req, res) => {
     }
     res.json(laptop);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Błąd podczas pobierania laptopa' });
+    console.error('Błąd podczas pobierania laptopa po SN:', error);
+    res.status(500).json({ error: 'Błąd serwera podczas pobierania laptopa' });
   }
 });
 
@@ -69,7 +92,9 @@ router.put('/:id', authenticate, isAdmin, async (req, res) => {
        return res.status(404).json({ error: 'Laptop nie znaleziony' });
     }
     if (serialNumber && existingLaptop.serialNumber !== serialNumber) {
-       const qrData = `https://twoja-aplikacja.com/laptop/${serialNumber}`;
+       // Use the frontend URL structure
+       const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'; // Use env variable or default
+       const qrData = `${frontendBaseUrl}/laptop/serial/${serialNumber}`;
        qrCode = await QRCode.toDataURL(qrData);
     }
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // Import useParams
 import { jwtDecode } from 'jwt-decode';
 
 const AddLaptopForm = () => {
+  const { id } = useParams(); // Get ID from URL params
+  const isEditMode = Boolean(id); // Check if in edit mode
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -22,6 +24,7 @@ const AddLaptopForm = () => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
+  const [initialLoading, setInitialLoading] = useState(isEditMode); // Loading state for fetching data in edit mode
 
   useEffect(() => {
     if (token) {
@@ -32,7 +35,34 @@ const AddLaptopForm = () => {
         console.error('Error decoding token:', error);
       }
     }
-  }, [token]);
+
+    // Fetch laptop data if in edit mode
+    if (isEditMode) {
+      setInitialLoading(true);
+      axios.get(`${process.env.REACT_APP_API_URL}/api/laptops/${id}`) // Use GET by ID
+        .then(response => {
+          const laptopData = response.data;
+          setFormData({
+            brand: laptopData.brand || '',
+            model: laptopData.model || '',
+            serialNumber: laptopData.serialNumber || '',
+            description: laptopData.description || '',
+            specs: {
+              cpu: laptopData.specs?.cpu || '',
+              ram: laptopData.specs?.ram || '',
+              disk: laptopData.specs?.disk || ''
+            },
+            images: laptopData.images?.join('\n') || '' // Convert array back to string for textarea
+          });
+          setInitialLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching laptop data:', error);
+          setErrors({ api: 'Nie udało się załadować danych laptopa do edycji.' });
+          setInitialLoading(false);
+        });
+    }
+  }, [token, isEditMode, id]); // Add dependencies
 
   const validate = () => {
     const newErrors = {};
@@ -83,30 +113,52 @@ const AddLaptopForm = () => {
         images: imagesArray
       };
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/laptops`,
-        dataToSend,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+      let response;
+      if (isEditMode) {
+        // Send PUT request for editing
+        response = await axios.put(
+          `${process.env.REACT_APP_API_URL}/api/laptops/${id}`,
+          dataToSend,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-      
+        );
+      } else {
+        // Send POST request for adding
+        response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/laptops`,
+          dataToSend,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      }
+       
       setSuccess(true);
+      // Navigate back to the list after a delay
       setTimeout(() => navigate('/'), 1500);
     } catch (error) {
       console.error('Add laptop error:', error);
       if (error.response?.status === 403) {
         setErrors({ api: 'Brak uprawnień. Włącz JavaScript i odśwież stronę.' });
       } else {
-        setErrors({ api: 'Wystąpił błąd podczas dodawania laptopa' });
+        setErrors({ api: `Wystąpił błąd podczas ${isEditMode ? 'aktualizacji' : 'dodawania'} laptopa` });
       }
     } finally {
       setLoading(false);
     }
   };
+  
+  // Show loading indicator while fetching data in edit mode
+  if (initialLoading) {
+    return <div className="loading-container"><div className="loading"><div className="loading-spinner"></div><p>Ładowanie danych do edycji...</p></div></div>;
+  }
 
   if (!token) {
     return (
@@ -127,13 +179,13 @@ const AddLaptopForm = () => {
 
   return (
     <div className="add-laptop-form">
-      <h2>Dodaj nowy laptop</h2>
+      <h2>{isEditMode ? 'Edytuj laptop' : 'Dodaj nowy laptop'}</h2>
       
       {errors.api && <div className="error-message">{errors.api}</div>}
       
       {success && (
         <div className="success-message">
-          Pomyślnie dodano laptopa! Zaraz zostaniesz przekierowany...
+          Pomyślnie {isEditMode ? 'zaktualizowano' : 'dodano'} laptopa! Zaraz zostaniesz przekierowany...
         </div>
       )}
 
@@ -244,7 +296,7 @@ const AddLaptopForm = () => {
           disabled={loading}
           className="submit-button"
         >
-          {loading ? 'Dodawanie...' : 'Dodaj laptop'}
+          {loading ? (isEditMode ? 'Aktualizowanie...' : 'Dodawanie...') : (isEditMode ? 'Zaktualizuj laptop' : 'Dodaj laptop')}
         </button>
       </form>
     </div>

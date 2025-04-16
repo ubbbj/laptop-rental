@@ -538,6 +538,37 @@ button:hover {
   background-color: var(--danger-hover-background); /* Use variable for hover */
 }
 
+/* Styles for admin action buttons in LaptopList */
+.laptop-admin-actions {
+  display: flex; /* Ustawia elementy w rzędzie */
+  gap: 10px; /* Dodaje odstęp między przyciskami */
+  margin-top: 15px; /* Dodaje odstęp od góry */
+  align-items: center; /* Wyrównuje przyciski w pionie */
+}
+
+.edit-button,
+.delete-button {
+  margin-top: 0; /* Usuwa domyślny margines górny z przycisków, jeśli istnieje */
+  padding: 8px 16px; /* Ujednolica padding */
+  font-size: 14px; /* Ujednolica rozmiar czcionki */
+}
+
+.edit-button {
+  background-color: var(--warning); /* Zmiana koloru dla odróżnienia */
+}
+
+.edit-button:hover {
+  background-color: #e67e22; /* Ciemniejszy odcień warning */
+}
+
+.delete-button {
+  background-color: var(--danger);
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .nav-links {

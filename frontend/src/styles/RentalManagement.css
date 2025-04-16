@@ -130,46 +130,44 @@
 }
 
 .btn-confirm {
-  background-color: var(--success-base); /* Zmienna */
-  color: var(--success-text); /* Zmienna */
+  background-color: var(--success-base); 
+  color: var(--success-text);
 }
 
 .btn-confirm:hover {
-  background-color: var(--success-base); /* Zmienna */
-  filter: brightness(90%); /* Przyciemnienie dla hover */
+  background-color: var(--success-base);
+  filter: brightness(90%);
 }
 
 .btn-reject {
-  background-color: var(--warning-base); /* Zmienna */
-  color: var(--white-base); /* Zmienna (założenie, że warning jest ciemny) */
-  /* Można by dodać --warning-text jeśli istnieje */
+  background-color: var(--warning-base);
+  color: var(--white-base);
 }
 
 .btn-reject:hover {
-  background-color: var(--warning-base); /* Zmienna */
-  filter: brightness(90%); /* Przyciemnienie dla hover */
+  background-color: var(--warning-base);
+  filter: brightness(90%);
 }
 
 .btn-end {
-  background-color: var(--danger-base); /* Zmienna */
-  color: var(--danger-text); /* Zmienna */
+  background-color: var(--danger-base);
+  color: var(--danger-text);
 }
 
 .btn-end:hover {
-  background-color: var(--danger-hover-background); /* Zmienna */
+  background-color: var(--danger-hover-background);
 }
 
-/* Komunikaty */
 .loading, .error-message, .no-rentals {
   text-align: center;
   padding: 20px;
   font-size: 18px;
-  color: var(--gray-base); /* Zmienna */
+  color: var(--gray-base); 
 }
 
 .error-message {
-  color: var(--danger-base); /* Zmienna */
-  background-color: var(--message-error-background); /* Dodano tło dla lepszej widoczności */
+  color: var(--danger-base);
+  background-color: var(--message-error-background);
   border-left: 4px solid var(--danger-base);
   border-radius: 4px;
   padding: 10px 15px;
@@ -185,4 +183,94 @@
   .filter-controls {
     flex-direction: column;
   }
+}
+
+/* Style dla wielu zdjęć laptopów */
+.laptop-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
+.laptop-image {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.laptop-image:hover {
+  transform: scale(1.05);
+}
+
+.laptop-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.zoom-icon {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-icon::after {
+  content: "+";
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Style dla przycisków admina w LaptopList */
+.laptop-admin-actions {
+  display: flex;
+  align-items: center; /* Pozostawiamy dla ogólnego wyrównania kontenera */
+  /* gap: 10px; Usunięto gap, użyjemy marginesu */
+  padding: 10px 15px;
+  border-top: 1px solid var(--input-border); /* Oddzielenie od reszty */
+}
+
+.laptop-admin-actions button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: var(--transition);
+  border: none;
+}
+
+.edit-button {
+  display: inline-flex; /* Dodano dla wyrównania zawartości */
+  align-items: center; /* Dodano dla wyrównania zawartości */
+  margin-right: 10px; /* Dodano margines zamiast gap */
+  background-color: var(--primary); /* Użyj koloru primary */
+  color: var(--button-text);
+}
+
+.edit-button:hover {
+  background-color: var(--primary);
+  filter: brightness(90%);
+}
+
+.delete-button {
+  display: inline-flex; /* Dodano dla wyrównania zawartości */
+  align-items: center; /* Dodano dla wyrównania zawartości */
+  background-color: var(--danger-base);
+  color: var(--danger-text);
+}
+
+.delete-button:hover {
+  background-color: var(--danger-hover-background);
 }

@@ -131,4 +131,17 @@ router.delete('/:id', authenticate, async (req, res) => {
   }
 });
 
+// Pobierz historię wypożyczeń (zakończone wypożyczenia)
+router.get('/history', authenticate, async (req, res) => {
+  try {
+    // Pobierz wszystkie wpisy z kolekcji Rental (historia)
+    // Sortuj od najnowszych (najnowszy zwrot na górze)
+    const history = await Rental.find({}).sort({ returnedAt: -1 }); 
+    res.json(history);
+  } catch (error) {
+    console.error('Błąd pobierania historii wypożyczeń:', error);
+    res.status(500).json({ message: 'Błąd pobierania historii wypożyczeń' });
+  }
+});
+
 module.exports = router;

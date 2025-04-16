@@ -6,6 +6,7 @@ import AddLaptopForm from './components/AddLaptopForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import RentalManagement from './components/RentalManagement';
+import LaptopRentalForm from './components/LaptopRentalForm'; // Import nowego komponentu
 // Removed duplicate import
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
@@ -126,6 +127,9 @@ const App = () => {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/rentals" element={isAdmin ? <RentalManagement /> : <Navigate to="/" />} />
+          <Route path="/edit-laptop/:id" element={isAdmin ? <AddLaptopForm /> : <Navigate to="/" />} />
+          {/* Nowa trasa dla formularza wypożyczenia po numerze seryjnym */}
+          <Route path="/laptop/serial/:serialNumber" element={<LaptopRentalForm />} />
         </Routes>
       </main>
     </div>

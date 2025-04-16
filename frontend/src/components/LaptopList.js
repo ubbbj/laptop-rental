@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ImageModal from './ImageModal';
 import '../styles/ImageModal.css';
 
 const LaptopList = ({ isAdmin }) => {
+  const navigate = useNavigate();
   const [laptops, setLaptops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -128,15 +130,16 @@ const LaptopList = ({ isAdmin }) => {
                   {laptop.isRented ? 'Wypożyczony' : 'Dostępny'}
                 </div>
               </div>
-                <div className="laptop-image" onClick={() => laptop.images && laptop.images.length > 0 && openImageModal(laptop.images[0])}>
-                {/* Wyświetl pierwsze zdjęcie jako miniaturkę, jeśli istnieje */}
-                {laptop.images && laptop.images.length > 0 && (
-                  <>
-                    <img src={laptop.images[0]} alt={`${laptop.brand} ${laptop.model}`} />
+              <div className="laptop-images">
+                {/* Wyświetl wszystkie zdjęcia jako miniaturki */}
+                {laptop.images && laptop.images.map((image, index) => (
+                  <div key={index} className="laptop-image" onClick={() => openImageModal(image)}>
+                    <img src={image} alt={`${laptop.brand} ${laptop.model} - zdjęcie ${index + 1}`} />
                     <div className="zoom-icon"></div>
-                  </>
-                )}
-              </div><div className="laptop-details">
+                  </div>
+                ))}
+              </div>
+              <div className="laptop-details">
                 <p><strong>Numer seryjny:</strong> {laptop.serialNumber}</p>
                 
                 {/* Przycisk do rozwijania specyfikacji i opisu */}
@@ -176,30 +179,36 @@ const LaptopList = ({ isAdmin }) => {
               <div className="laptop-qr">
                 <img src={laptop.qrCode} alt="Kod QR" width="150" />
               </div>
-              
+               
               {isAdmin && (
-                <button
-                  className="delete-button"
-                  onClick={async () => {
-                    if (window.confirm(`Czy na pewno chcesz usunąć laptop ${laptop.serialNumber}?`)) {
-                      try {
-                        {/* Poprawiono użycie ID zamiast serialNumber */}
-                        await axios.delete(`${process.env.REACT_APP_API_URL}/api/laptops/${laptop._id}`, {
-                          headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`
-                          }
-                        });
-                        // Filtrowanie po _id
-                        setLaptops(laptops.filter(l => l._id !== laptop._id));
-                      } catch (error) {
-                        console.error('Błąd usuwania laptopa:', error);
-                        alert('Nie udało się usunąć laptopa');
+                <div className="laptop-admin-actions">
+                  <button
+                    className="edit-button"
+                    onClick={() => navigate(`/edit-laptop/${laptop._id}`)}
+                  >
+                    <span>✏️</span>Edytuj
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={async () => {
+                      if (window.confirm(`Czy na pewno chcesz usunąć laptop ${laptop.serialNumber}?`)) {
+                        try {
+                          await axios.delete(`${process.env.REACT_APP_API_URL}/api/laptops/${laptop._id}`, {
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem('token')}`
+                            }
+                          });
+                          setLaptops(laptops.filter(l => l._id !== laptop._id));
+                        } catch (error) {
+                          console.error('Błąd usuwania laptopa:', error);
+                          alert('Nie udało się usunąć laptopa');
+                        }
                       }
-                    }
-                  }}
-                >
-                  <span role="img" aria-label="delete">🗑️</span> Usuń laptop
-                </button>
+                    }}
+                  >
+                    <span>🗑️</span>Usuń laptop
+                  </button>
+                </div>
               )}
             </div>
           ))}
