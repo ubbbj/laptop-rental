@@ -101,10 +101,10 @@ router.put('/:id', authenticate, isAdmin, async (req, res) => {
   }
 });
 
-// Usuwanie laptopa (tylko dla adminów) - zmieniono na ID
-router.delete('/:serialNumber', authenticate, isAdmin, async (req, res) => {
+// Usuwanie laptopa (tylko dla adminów)
+router.delete('/:id', authenticate, isAdmin, async (req, res) => {
   try {
-    const laptop = await Laptop.findByIdAndDelete(req.params.id); 
+    const laptop = await Laptop.findByIdAndDelete(req.params.id);
     if (!laptop) {
       return res.status(404).json({ error: 'Laptop nie znaleziony' });
     }
