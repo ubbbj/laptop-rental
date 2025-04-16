@@ -119,6 +119,21 @@ nav {
   align-items: center;
 }
 
+.nav-links button.header-button {
+  background-color: transparent;
+  color: var(--nav-text-color);
+  border: none;
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-links button.header-button:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+}
+
 nav a {
   color: var(--nav-text-color);
   text-decoration: none;
@@ -162,6 +177,38 @@ h2 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
+}
+
+.laptop-list-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px; /* Odstęp między przyciskami */
+}
+
+.header-button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.header-button:hover {
+  background-color: var(--button-hover-background);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.laptop-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 /* Card Design */
@@ -750,4 +797,87 @@ button:hover {
 
 .laptop-specs li {
   margin-bottom: 3px;
+}
+
+/* Reviews Section */
+.reviews-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  color: var(--text-color);
+}
+
+.reviews-section .review {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-bottom: 1px solid var(--specs-border);
+}
+
+.reviews-section .review:last-child {
+  border-bottom: none;
+}
+
+.reviews-section .review p {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.reviews-section .rating {
+  font-size: 18px;
+  color: var(--primary-text-color);
+}
+
+/* Przycisk Opinie */
+.reviews-button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.reviews-button:hover {
+  background-color: var(--button-hover-background);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Reviews Page */
+.reviews-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  color: var(--text-color);
+}
+
+.reviews-page .review {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-bottom: 1px solid var(--specs-border);
+}
+
+.reviews-page .review:last-child {
+  border-bottom: none;
+}
+
+.reviews-page .review p {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.reviews-page .rating {
+  font-size: 18px;
+  color: var(--primary-text-color);
 }

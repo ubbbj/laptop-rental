@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, Navigate } from 'react-router-dom';
 import LaptopList from './components/LaptopList';
 import ScanQR from './components/ScanQR';
@@ -6,7 +6,7 @@ import AddLaptopForm from './components/AddLaptopForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import RentalManagement from './components/RentalManagement';
-// Removed duplicate import
+import ReviewsPage from './components/ReviewsPage'; // Import nowego komponentu
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
 
@@ -16,7 +16,6 @@ const App = () => {
   const [username, setUsername] = useState('');
   const location = useLocation();
   const [theme, setTheme] = useState(() => {
-    // Get theme from localStorage or default to 'light'
     const savedTheme = localStorage.getItem('theme');
     return savedTheme || 'light';
   });
@@ -37,11 +36,10 @@ const App = () => {
       setIsAdmin(false);
       setIsLoggedIn(false);
     }
-  }, [location]); // Keep this useEffect for auth check
+  }, [location]);
 
-  // Effect to apply theme class to body and save to localStorage
   useEffect(() => {
-    document.body.classList.remove('light-mode', 'dark-mode'); // Remove previous classes
+    document.body.classList.remove('light-mode', 'dark-mode');
     document.body.classList.add(`${theme}-mode`);
     localStorage.setItem('theme', theme);
   }, [theme]);
@@ -52,9 +50,8 @@ const App = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setIsAdmin(false);
     setIsLoggedIn(false);
-    return <Navigate to="/" />;
+    setIsAdmin(false);
   };
 
   return (
@@ -64,25 +61,15 @@ const App = () => {
           <Link to="/">
             <span role="img" aria-label="laptops">💻</span> Lista laptopów
           </Link>
-            {isAdmin && 
-            <Link to="/add">
-              <span role="img" aria-label="add">➕</span> Dodaj laptop
-            </Link>
-          }
-          
-          {isAdmin && 
-            <Link to="/rentals">
-              <span role="img" aria-label="rentals">💻</span> Wypożyczenia
-            </Link>
-          }
-          
           <Link to="/scan">
             <span role="img" aria-label="scan">🔍</span> Skanuj QR
           </Link>
-          
+          <Link to="/reviews">
+            <span role="img" aria-label="reviews">⭐</span> Opinie
+          </Link> {/* Dodano link do strony Opinie */}
           {isLoggedIn ? (
             <>
-              <span style={{color: 'white', marginLeft: 'auto', padding: '15px 10px'}}>
+              <span style={{ color: 'white', marginLeft: 'auto', padding: '15px 10px' }}>
                 {isAdmin ? (
                   <>
                     <span role="img" aria-label="admin">🛡️</span> Admin
@@ -99,7 +86,7 @@ const App = () => {
             </>
           ) : (
             <>
-              <Link to="/login" style={{marginLeft: 'auto'}}>
+              <Link to="/login" style={{ marginLeft: 'auto' }}>
                 <span role="img" aria-label="login">🔑</span> Zaloguj
               </Link>
               <Link to="/register">
@@ -107,11 +94,19 @@ const App = () => {
               </Link>
             </>
           )}
-          {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             className="theme-toggle-button"
-            style={{ marginLeft: isLoggedIn ? '10px' : 'auto', marginRight: '10px', padding: '10px 15px', background: 'rgba(255, 255, 255, 0.2)', border: 'none', color: 'white', borderRadius: '5px', cursor: 'pointer' }}
+            style={{
+              marginLeft: isLoggedIn ? '10px' : 'auto',
+              marginRight: '10px',
+              padding: '10px 15px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
             aria-label={`Przełącz na tryb ${theme === 'light' ? 'ciemny' : 'jasny'}`}
           >
             {theme === 'light' ? '🌙' : '☀️'}
@@ -119,6 +114,10 @@ const App = () => {
         </div>
       </nav>
       <main>
+        <div className="laptop-list">
+          {/* Lista laptopów */}
+        </div>
+
         <Routes>
           <Route path="/" element={<LaptopList isAdmin={isAdmin} />} />
           <Route path="/add" element={isAdmin ? <AddLaptopForm /> : <Navigate to="/" />} />
@@ -126,6 +125,7 @@ const App = () => {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/rentals" element={isAdmin ? <RentalManagement /> : <Navigate to="/" />} />
+          <Route path="/reviews" element={<ReviewsPage />} /> {/* Nowa trasa dla strony Opinie */}
         </Routes>
       </main>
     </div>
