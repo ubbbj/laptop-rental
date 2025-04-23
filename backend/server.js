@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const laptopRoutes = require('./routes/laptops');
 const { router: authRouter, authenticate, isAdmin } = require('./routes/auth');
 const rentalRoutes = require('./routes/rentals');
@@ -15,6 +16,9 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
+
+// Serve static files from uploads directory at root level
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Konfiguracja dozwolonych źródeł
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',')

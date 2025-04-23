@@ -1,30 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom'; // Import useParams
+import { useNavigate, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 const AddLaptopForm = () => {
-  const { id } = useParams(); // Get ID from URL params
-  const isEditMode = Boolean(id); // Check if in edit mode
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
     serialNumber: '',
-    description: '', // Dodano opis
-    specs: { // Dodano specyfikację
+    description: '',
+    specs: {
       cpu: '',
       ram: '',
       disk: ''
     },
-    images: '' // Dodano pole na URL-e zdjęć (jako string)
+    images: '' // URL-e zdjęć (jako string)
   });
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const fileInputRef = useRef(null);
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
-  const [initialLoading, setInitialLoading] = useState(isEditMode); // Loading state for fetching data in edit mode
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
 
   useEffect(() => {
     if (token) {
@@ -36,10 +40,9 @@ const AddLaptopForm = () => {
       }
     }
 
-    // Fetch laptop data if in edit mode
     if (isEditMode) {
       setInitialLoading(true);
-      axios.get(`${process.env.REACT_APP_API_URL}/api/laptops/${id}`) // Use GET by ID
+      axios.get(`${process.env.REACT_APP_API_URL}/api/laptops/${id}`)
         .then(response => {
           const laptopData = response.data;
           setFormData({
@@ -52,7 +55,7 @@ const AddLaptopForm = () => {
               ram: laptopData.specs?.ram || '',
               disk: laptopData.specs?.disk || ''
             },
-            images: laptopData.images?.join('\n') || '' // Convert array back to string for textarea
+            images: laptopData.images?.join('\n') || ''
           });
           setInitialLoading(false);
         })
@@ -62,25 +65,19 @@ const AddLaptopForm = () => {
           setInitialLoading(false);
         });
     }
-  }, [token, isEditMode, id]); // Add dependencies
+  }, [token, isEditMode, id]);
 
   const validate = () => {
     const newErrors = {};
     if (!formData.brand.trim()) newErrors.brand = 'Marka jest wymagana';
     if (!formData.model.trim()) newErrors.model = 'Model jest wymagany';
     if (!formData.serialNumber.trim()) newErrors.serialNumber = 'Numer seryjny jest wymagany';
-    // Można dodać walidację dla nowych pól, np.
-    // if (!formData.description.trim()) newErrors.description = 'Opis jest wymagany';
-    // if (!formData.specs.cpu.trim()) newErrors.cpu = 'CPU jest wymagane';
-    // ... itd.
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Obsługa zagnieżdżonych pól specs
     if (name.startsWith('specs.')) {
       const specField = name.split('.')[1];
       setFormData(prevData => ({
@@ -98,6 +95,26 @@ const AddLaptopForm = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploadedImages(prevImages => [...prevImages, ...files]);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prevPreviews => [...prevPreviews, reader.result]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => {
+    setUploadedImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setImagePreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -106,42 +123,50 @@ const AddLaptopForm = () => {
     
     try {
       setLoading(true);
-      // Przygotowanie danych do wysłania (przetworzenie images)
-      const imagesArray = formData.images.split(/[\n,]+/).map(url => url.trim()).filter(url => url);
-      const dataToSend = {
-        ...formData,
-        images: imagesArray
-      };
+      
+      const imagesArray = formData.images.split(/[\n,]+/)
+        .map(url => url.trim())
+        .filter(url => url);
+      
+      const formDataToSend = new FormData();
+      
+      formDataToSend.append('brand', formData.brand);
+      formDataToSend.append('model', formData.model);
+      formDataToSend.append('serialNumber', formData.serialNumber);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('specs', JSON.stringify(formData.specs));
+      formDataToSend.append('imageUrls', JSON.stringify(imagesArray));
+      
+      uploadedImages.forEach((file, index) => {
+        formDataToSend.append('files', file);
+      });
 
       let response;
       if (isEditMode) {
-        // Send PUT request for editing
         response = await axios.put(
           `${process.env.REACT_APP_API_URL}/api/laptops/${id}`,
-          dataToSend,
+          formDataToSend,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+              'Content-Type': 'multipart/form-data'
             }
           }
         );
       } else {
-        // Send POST request for adding
         response = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/laptops`,
-          dataToSend,
+          formDataToSend,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+              'Content-Type': 'multipart/form-data'
             }
           }
         );
       }
        
       setSuccess(true);
-      // Navigate back to the list after a delay
       setTimeout(() => navigate('/'), 1500);
     } catch (error) {
       console.error('Add laptop error:', error);
@@ -155,7 +180,6 @@ const AddLaptopForm = () => {
     }
   };
   
-  // Show loading indicator while fetching data in edit mode
   if (initialLoading) {
     return <div className="loading-container"><div className="loading"><div className="loading-spinner"></div><p>Ładowanie danych do edycji...</p></div></div>;
   }
@@ -229,7 +253,6 @@ const AddLaptopForm = () => {
           {errors.serialNumber && <span className="error-text">{errors.serialNumber}</span>}
         </div>
 
-        {/* Dodano nowe pola formularza */}
         <div className="form-group">
           <label htmlFor="description">Opis:</label>
           <textarea
@@ -239,7 +262,6 @@ const AddLaptopForm = () => {
             onChange={handleChange}
             rows="3"
           ></textarea>
-          {/* Można dodać walidację */}
         </div>
 
         <fieldset className="form-group specs-group">
@@ -253,7 +275,6 @@ const AddLaptopForm = () => {
               value={formData.specs.cpu}
               onChange={handleChange}
             />
-            {/* Można dodać walidację */}
           </div>
           <div className="form-group">
             <label htmlFor="specs.ram">RAM:</label>
@@ -264,7 +285,6 @@ const AddLaptopForm = () => {
               value={formData.specs.ram}
               onChange={handleChange}
             />
-            {/* Można dodać walidację */}
           </div>
           <div className="form-group">
             <label htmlFor="specs.disk">Dysk:</label>
@@ -275,7 +295,6 @@ const AddLaptopForm = () => {
               value={formData.specs.disk}
               onChange={handleChange}
             />
-            {/* Można dodać walidację */}
           </div>
         </fieldset>
 
@@ -287,8 +306,49 @@ const AddLaptopForm = () => {
             value={formData.images}
             onChange={handleChange}
             rows="3"
+            placeholder="np. https://example.com/image1.jpg, https://example.com/image2.jpg"
           ></textarea>
-          {/* Można dodać walidację */}
+        </div>
+
+        <div className="form-group">
+          <label>Dodaj własne zdjęcia:</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+          />
+          <div className="file-upload-container">
+            <button 
+              type="button"
+              className="file-upload-button"
+              onClick={() => fileInputRef.current.click()}
+            >
+              Wybierz pliki
+            </button>
+            <span className="file-info">
+              {uploadedImages.length > 0 ? `Wybrano plików: ${uploadedImages.length}` : 'Nie wybrano żadnych plików'}
+            </span>
+          </div>
+
+          {imagePreviews.length > 0 && (
+            <div className="image-preview-container">
+              {imagePreviews.map((preview, index) => (
+                <div key={index} className="image-preview">
+                  <img src={preview} alt={`Preview ${index + 1}`} />
+                  <button 
+                    type="button" 
+                    className="remove-image" 
+                    onClick={() => removeImage(index)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <button 

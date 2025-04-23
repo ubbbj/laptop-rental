@@ -1,22 +1,73 @@
 const express = require('express');
-const mongoose = require('mongoose'); // Dodano import mongoose
+const mongoose = require('mongoose');
 const QRCode = require('qrcode');
 const Laptop = require('../models/Laptop');
 const router = express.Router();
 const { authenticate, isAdmin } = require('./auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)){
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Create unique filename with original extension
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+// Filter to accept only image files
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Dozwolone są tylko pliki graficzne!'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB max file size
+  }
+});
 
 // Tworzenie nowego laptopa z kodem QR
-router.post('/', authenticate, isAdmin, async (req, res) => {
+router.post('/', authenticate, isAdmin, upload.array('files', 10), async (req, res) => {
   try {
-    // Dodano nowe pola
-    const { brand, model, serialNumber, description, specs, images } = req.body;
+    // Parse JSON strings from form data
+    const specs = req.body.specs ? JSON.parse(req.body.specs) : {};
+    const imageUrls = req.body.imageUrls ? JSON.parse(req.body.imageUrls) : [];
     
-    // Use the frontend URL structure
-    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'; // Use env variable or default
+    // Get uploaded file paths
+    const uploadedFilePaths = req.files ? req.files.map(file => {
+      // Create URL path for the uploaded file
+      return `${process.env.API_URL || 'http://localhost:5000'}/uploads/${file.filename}`;
+    }) : [];
+    
+    // Combine URL images and uploaded file paths
+    const allImages = [...imageUrls, ...uploadedFilePaths];
+    
+    // Extract other fields from the request
+    const { brand, model, serialNumber, description } = req.body;
+    
+    // Use the frontend URL structure for QR code
+    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const qrData = `${frontendBaseUrl}/laptop/serial/${serialNumber}`;
     const qrCode = await QRCode.toDataURL(qrData);
 
-    // Dodano nowe pola do tworzonego obiektu
+    // Create new laptop object
     const newLaptop = new Laptop({
       brand,
       model,
@@ -24,10 +75,10 @@ router.post('/', authenticate, isAdmin, async (req, res) => {
       qrCode,
       description,
       specs,
-      images: images || [] // Upewnij się, że images jest tablicą
+      images: allImages
     });
+    
     await newLaptop.save();
-
     res.json(newLaptop);
   } catch (error) {
     console.error(error);
@@ -81,35 +132,55 @@ router.get('/serial/:serialNumber', async (req, res) => { // Zmieniono ścieżk�
 });
 
 // Aktualizacja laptopa (tylko dla adminów)
-router.put('/:id', authenticate, isAdmin, async (req, res) => {
+router.put('/:id', authenticate, isAdmin, upload.array('files', 10), async (req, res) => {
   try {
-    const { brand, model, serialNumber, description, specs, images } = req.body;
+    // Parse JSON strings from form data
+    const specs = req.body.specs ? JSON.parse(req.body.specs) : {};
+    const imageUrls = req.body.imageUrls ? JSON.parse(req.body.imageUrls) : [];
+    
+    // Get uploaded file paths
+    const uploadedFilePaths = req.files ? req.files.map(file => {
+      // Create URL path for the uploaded file
+      return `${process.env.API_URL || 'http://localhost:5000'}/uploads/${file.filename}`;
+    }) : [];
+    
+    // Combine URL images and uploaded file paths
+    const allImages = [...imageUrls, ...uploadedFilePaths];
+    
+    const { brand, model, serialNumber, description } = req.body;
     
     // Generowanie nowego QR kodu jeśli numer seryjny się zmienił
-    let qrCode = req.body.qrCode; // Zachowaj stary, jeśli nie ma zmiany SN
+    let qrCode = null;
     const existingLaptop = await Laptop.findById(req.params.id);
     if (!existingLaptop) {
        return res.status(404).json({ error: 'Laptop nie znaleziony' });
     }
+    
     if (serialNumber && existingLaptop.serialNumber !== serialNumber) {
        // Use the frontend URL structure
-       const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'; // Use env variable or default
+       const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
        const qrData = `${frontendBaseUrl}/laptop/serial/${serialNumber}`;
        qrCode = await QRCode.toDataURL(qrData);
     }
 
+    const updateData = {
+      brand,
+      model,
+      serialNumber,
+      description,
+      specs,
+      images: allImages
+    };
+
+    // Add QR code to update data only if it was changed
+    if (qrCode) {
+      updateData.qrCode = qrCode;
+    }
+
     const updatedLaptop = await Laptop.findByIdAndUpdate(
       req.params.id,
-      {
-        brand,
-        model,
-        serialNumber,
-        description,
-        specs,
-        images: images || [], // Upewnij się, że images jest tablicą
-        qrCode // Zaktualizuj QR kod jeśli trzeba
-      },
-      { new: true } // Zwraca zaktualizowany dokument
+      updateData,
+      { new: true }
     );
 
     if (!updatedLaptop) {
@@ -118,7 +189,6 @@ router.put('/:id', authenticate, isAdmin, async (req, res) => {
     res.json(updatedLaptop);
   } catch (error) {
     console.error('Błąd aktualizacji laptopa:', error);
-    // Obsługa błędu duplikatu klucza (unique: true dla serialNumber)
     if (error.code === 11000) {
        return res.status(400).json({ error: 'Numer seryjny musi być unikalny.' });
     }
@@ -140,5 +210,7 @@ router.delete('/:id', authenticate, isAdmin, async (req, res) => {
   }
 });
 
+// Serve static files from uploads directory
+router.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 module.exports = router;
