@@ -76,7 +76,7 @@ const ScanQR = () => {
 
     const serialNumber = url.split('/').pop();
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/laptops/${serialNumber}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/laptops/serial/${serialNumber}`);
       setLaptopInfo(response.data);
     } catch (err) {
       console.error("Błąd pobierania danych laptopa:", err);
