@@ -59,16 +59,16 @@ const ScanQR = () => {
       if (scannerRef.current) {
         scannerRef.current.clear()
           .then(() => {
-            scannerRef.current = null; // Resetujemy ref po wyczyszczeniu
+            scannerRef.current = null;
             console.log("Skaner wyczyszczony.");
           })
           .catch(error => {
             console.error("Błąd przy czyszczeniu skanera w cleanup:", error);
-            scannerRef.current = null; // Resetujemy ref nawet jeśli czyszczenie zawiodło
+            scannerRef.current = null;
           });
       }
     };
-  }, [scanResult]); // Uruchom ponownie, gdy zmieni się scanResult
+  }, [scanResult]);
 
   const fetchLaptopInfo = async (url) => {
     setLoading(true);
@@ -161,19 +161,16 @@ const ScanQR = () => {
                 <p>Numer seryjny: {laptopInfo.serialNumber}</p>
                 <p>Status: {laptopInfo.isRented ? (laptopInfo.rentalStatus === 'pending' ? 'Oczekuje na potwierdzenie' : 'Wypożyczony') : 'Dostępny'}</p>
                 
-                {/* Przycisk otwiera formularz */}
                 {!laptopInfo.isRented && !showRentalForm && (
                   <div className="laptop-actions">
                     <button onClick={handleOpenRentalForm}>Wypożycz teraz</button>
                   </div>
                 )}
 
-                {/* Formularz wypożyczenia */}
                 {showRentalForm && (
-                  <div className="rental-form-container"> {/* Zmieniono klasę CSS */}
+                  <div className="rental-form-container">
                     <h4>Formularz wypożyczenia laptopa</h4>
                     <form onSubmit={handleRentalSubmit}>
-                      {/* Dodano pola dat */}
                       <div className="form-group">
                         <label htmlFor="startDate">Data rozpoczęcia:</label>
                         <input
@@ -183,7 +180,7 @@ const ScanQR = () => {
                           value={rentalData.startDate}
                           onChange={handleInputChange}
                           required
-                          min={new Date().toISOString().split('T')[0]} // Minimalna data to dzisiaj
+                          min={new Date().toISOString().split('T')[0]}
                         />
                       </div>
                       
@@ -196,7 +193,7 @@ const ScanQR = () => {
                           value={rentalData.endDate}
                           onChange={handleInputChange}
                           required
-                          min={rentalData.startDate || new Date().toISOString().split('T')[0]} // Minimalna data to data rozpoczęcia lub dzisiaj
+                          min={rentalData.startDate || new Date().toISOString().split('T')[0]}
                         />
                       </div>
                       <div className="form-group">
@@ -247,7 +244,6 @@ const ScanQR = () => {
                   </div>
                 )}
 
-                {/* Komunikat sukcesu */}
                 {rentalSuccess && (
                   <div className="success-message">
                     <p>Wniosek o wypożyczenie został wysłany!</p>
@@ -259,14 +255,12 @@ const ScanQR = () => {
               <p>Nie znaleziono informacji o laptopie.</p>
             )}
             
-            {/* Zmodyfikowano onClick - tylko resetuje stany */}
             <button onClick={() => {
               setScanResult('');
               setLaptopInfo(null);
               setShowRentalForm(false);
               setRentalSuccess(false);
-              setError(null); // Dodano reset błędu
-              // Usunięto próbę ponownego renderowania skanera - zajmie się tym useEffect
+              setError(null);
             }}>
               Skanuj ponownie
             </button>

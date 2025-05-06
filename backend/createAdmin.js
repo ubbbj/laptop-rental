@@ -5,29 +5,24 @@ const mongoose = require('mongoose');
 
 async function createAdmin() {
   try {
-    // Połączenie z MongoDB
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
-    // Dane admina
     const adminEmail = 'admin@laptop.com';
-    const adminPassword = 'admin123';
+    const adminPassword = 'L@pt0p$Admin#2025';
     
-    // Sprawdzenie czy admin już istnieje
     const existingAdmin = await User.findOne({ email: adminEmail });
     if (existingAdmin) {
       console.log('Admin already exists:', existingAdmin);
       return process.exit(0);
     }
 
-    // Hashowanie hasła
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-    // Tworzenie admina z wyraźnie ustawioną rolą
     const admin = new User({
       email: adminEmail,
       password: hashedPassword,
-      role: 'admin' // Explicitnie ustawiamy rolę admin
+      role: 'admin'
     });
 
     await admin.save();
@@ -36,6 +31,9 @@ async function createAdmin() {
       role: admin.role,
       _id: admin._id
     });
+    console.log('WAŻNE: Zapisz te dane logowania administratora:');
+    console.log(`Email: ${adminEmail}`);
+    console.log(`Hasło: ${adminPassword}`);
 
     process.exit(0);
   } catch (error) {

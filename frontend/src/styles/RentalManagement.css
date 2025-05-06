@@ -1,19 +1,17 @@
-/* Ogólne style dla zarządzania wypożyczeniami */
 .rental-management {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text-color); /* Dodano domyślny kolor tekstu */
+  color: var(--text-color);
 }
 
 .rental-management h2 {
-  color: var(--secondary-text-color); /* Zmienna */
+  color: var(--secondary-text-color);
   margin-bottom: 20px;
   text-align: center;
 }
 
-/* Filtry */
 .filter-controls {
   display: flex;
   gap: 10px;
@@ -23,26 +21,25 @@
 
 .filter-controls button {
   padding: 8px 16px;
-  border: 1px solid var(--input-border); /* Dodano subtelne obramowanie */
+  border: 1px solid var(--input-border);
   border-radius: 4px;
-  background-color: var(--input-background); /* Zmienna */
-  color: var(--text-color); /* Zmieniono z --secondary-text-color dla lepszego kontrastu */
+  background-color: var(--input-background);
+  color: var(--text-color);
   cursor: pointer;
   transition: var(--transition);
 }
 
 .filter-controls button.active {
-  background-color: var(--primary); /* Zmienna */
-  color: var(--button-text); /* Zmienna (tekst na tle primary) */
-  border-color: var(--primary); /* Dopasowanie koloru ramki */
+  background-color: var(--primary);
+  color: var(--button-text);
+  border-color: var(--primary);
 }
 
-.filter-controls button:hover:not(.active) { /* Dodano :not(.active) */
-  background-color: var(--input-focus-background); /* Zmienna (subtelny hover) */
+.filter-controls button:hover:not(.active) { 
+  background-color: var(--input-focus-background); 
   border-color: var(--input-focus-border);
 }
 
-/* Lista wypożyczeń */
 .rentals-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -50,18 +47,17 @@
 }
 
 .rental-card {
-  background: var(--card-background); /* Zmienna */
+  background: var(--card-background);
   border-radius: 8px;
-  box-shadow: var(--shadow); /* Zmienna */
+  box-shadow: var(--shadow);
   overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s; /* Dodano transition dla shadow */
-  border: 1px solid var(--input-border); /* Zmienna */
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid var(--input-border);
 }
 
 .rental-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* Lekko wzmocniony cień przy hover */
-  /* W trybie ciemnym cień może wymagać innego dostosowania, ale na razie zostawiamy tak */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .rental-header {
@@ -70,22 +66,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--expanded-details-background); /* Zmienna */
-  border-bottom: 1px solid var(--input-border); /* Zmienna */
+  background-color: var(--expanded-details-background);
+  border-bottom: 1px solid var(--input-border);
 }
 
 .rental-summary h3 {
   margin: 0 0 5px 0;
-  color: var(--secondary-text-color); /* Zmienna */
+  color: var(--secondary-text-color);
 }
 
 .rental-summary p {
   margin: 5px 0;
-  color: var(--gray-base); /* Zmienna */
-  font-size: 0.9em; /* Lekko zmniejszono dla hierarchii */
+  color: var(--gray-base);
+  font-size: 0.9em;
 }
 
-/* Statusy wypożyczeń */
 .badge {
   padding: 5px 10px;
   border-radius: 20px;
@@ -96,23 +91,20 @@
 
 .badge-pending,
 .badge-confirmed {
-  background-color: var(--success-base); /* Zmienna */
-  color: var(--success-text); /* Zmienna */
+  background-color: var(--success-base);
+  color: var(--success-text);
 }
 
 .badge-unknown {
-  background-color: var(--gray-base); /* Zmienna */
-  color: var(--white-base); /* Zmienna (założenie, że szary jest wystarczająco ciemny) */
-  /* Można by dodać --gray-text jeśli istnieje */
+  background-color: var(--gray-base);
+  color: var(--white-base);
 }
 
-/* Szczegóły wypożyczenia */
 .rental-details {
   padding: 15px;
-  background-color: var(--card-background); /* Upewnienie się, że tło jest spójne */
+  background-color: var(--card-background);
 }
 
-/* Przyciski akcji */
 .rental-actions {
   margin-top: 15px;
   display: flex;
@@ -174,7 +166,6 @@
   text-align: left;
 }
 
-/* Responsywność */
 @media (max-width: 768px) {
   .rentals-list {
     grid-template-columns: 1fr;
@@ -185,7 +176,6 @@
   }
 }
 
-/* Style dla wielu zdjęć laptopów */
 .laptop-images {
   display: flex;
   flex-wrap: wrap;
@@ -233,13 +223,11 @@
   font-weight: bold;
 }
 
-/* Style dla przycisków admina w LaptopList */
 .laptop-admin-actions {
   display: flex;
-  align-items: center; /* Pozostawiamy dla ogólnego wyrównania kontenera */
-  /* gap: 10px; Usunięto gap, użyjemy marginesu */
+  align-items: center;
   padding: 10px 15px;
-  border-top: 1px solid var(--input-border); /* Oddzielenie od reszty */
+  border-top: 1px solid var(--input-border);
 }
 
 .laptop-admin-actions button {
@@ -252,25 +240,88 @@
 }
 
 .edit-button {
-  display: inline-flex; /* Dodano dla wyrównania zawartości */
-  align-items: center; /* Dodano dla wyrównania zawartości */
-  margin-right: 10px; /* Dodano margines zamiast gap */
-  background-color: var(--primary); /* Użyj koloru primary */
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+  background-color: var(--primary);
   color: var(--button-text);
+  transition: var(--transition);
 }
 
 .edit-button:hover {
   background-color: var(--primary);
   filter: brightness(90%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .delete-button {
-  display: inline-flex; /* Dodano dla wyrównania zawartości */
-  align-items: center; /* Dodano dla wyrównania zawartości */
+  display: inline-flex;
+  align-items: center;
   background-color: var(--danger-base);
   color: var(--danger-text);
+  transition: var(--transition);
 }
 
 .delete-button:hover {
   background-color: var(--danger-hover-background);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rental-history-container {
+  margin-top: 20px;
+}
+
+.rental-history-container h3 {
+  color: var(--secondary-text-color);
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.rental-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rental-item {
+  margin-bottom: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+  background-color: var(--card-background);
+  box-shadow: var(--shadow);
+}
+
+.rental-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.rental-item.expanded {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.badge-history {
+  background-color: var(--gray-base);
+  color: var(--white-base);
+}
+
+.rental-dates {
+  margin-top: 10px;
+  font-size: 0.95em;
+}
+
+.rental-dates p {
+  margin: 8px 0;
+}
+
+.no-rentals {
+  padding: 20px;
+  text-align: center;
+  background-color: var(--no-results-background);
+  border-radius: 8px;
+  color: var(--no-results-text);
+  font-size: 16px;
 }

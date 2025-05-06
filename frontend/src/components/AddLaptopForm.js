@@ -16,7 +16,7 @@ const AddLaptopForm = () => {
       ram: '',
       disk: ''
     },
-    images: '' // URL-e zdjęć (jako string)
+    images: ''
   });
   const [uploadedImages, setUploadedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);

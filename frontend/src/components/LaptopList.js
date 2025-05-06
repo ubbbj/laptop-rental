@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ImageModal from './ImageModal';
@@ -10,9 +10,9 @@ const LaptopList = ({ isAdmin }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('brand'); // Default sort by brand
-  const [expandedSpecsId, setExpandedSpecsId] = useState(null); // Stan dla rozwijanej specyfikacji
-  const [selectedImage, setSelectedImage] = useState(null); // Stan dla wybranego zdjęcia do powiększenia
+  const [sortBy, setSortBy] = useState('brand');
+  const [expandedSpecsId, setExpandedSpecsId] = useState(null); 
+  const [selectedImage, setSelectedImage] = useState(null); 
 
   useEffect(() => {
     setLoading(true);
@@ -28,13 +28,13 @@ const LaptopList = ({ isAdmin }) => {
       });
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value.toLowerCase());
-  };
+  }, []);
 
-  const handleSort = (e) => {
+  const handleSort = useCallback((e) => {
     setSortBy(e.target.value);
-  };
+  }, []);
 
   const filteredLaptops = laptops.filter(laptop => 
     laptop.brand.toLowerCase().includes(searchTerm) || 
@@ -54,17 +54,14 @@ const LaptopList = ({ isAdmin }) => {
     }
     return 0;
   });
-  // Funkcja do przełączania widoczności specyfikacji
   const toggleSpecs = (id) => {
     setExpandedSpecsId(expandedSpecsId === id ? null : id);
   };
 
-  // Funkcja do otwierania modalu ze zdjęciem
   const openImageModal = (imageUrl) => {
     setSelectedImage(imageUrl);
   };
 
-  // Funkcja do zamykania modalu ze zdjęciem
   const closeImageModal = () => {
     setSelectedImage(null);
   };
@@ -131,7 +128,6 @@ const LaptopList = ({ isAdmin }) => {
                 </div>
               </div>
               <div className="laptop-images">
-                {/* Wyświetl wszystkie zdjęcia jako miniaturki */}
                 {laptop.images && laptop.images.map((image, index) => (
                   <div key={index} className="laptop-image" onClick={() => openImageModal(image)}>
                     <img src={image} alt={`${laptop.brand} ${laptop.model} - zdjęcie ${index + 1}`} />
@@ -142,7 +138,6 @@ const LaptopList = ({ isAdmin }) => {
               <div className="laptop-details">
                 <p><strong>Numer seryjny:</strong> {laptop.serialNumber}</p>
                 
-                {/* Przycisk do rozwijania specyfikacji i opisu */}
                 {(laptop.description || (laptop.specs && (laptop.specs.cpu || laptop.specs.ram || laptop.specs.disk))) && (
                   <button
                     onClick={() => toggleSpecs(laptop._id)}
@@ -152,7 +147,6 @@ const LaptopList = ({ isAdmin }) => {
                   </button>
                 )}
                 
-                {/* Warunkowe renderowanie opisu i specyfikacji */}
                 {expandedSpecsId === laptop._id && (
                   <div className="laptop-expanded-details">
                     {laptop.description && (
@@ -218,4 +212,4 @@ const LaptopList = ({ isAdmin }) => {
   );
 };
 
-export default LaptopList;
+export default React.memo(LaptopList);

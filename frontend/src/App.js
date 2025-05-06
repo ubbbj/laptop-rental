@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, Navigate } from 'react-router-dom';
 import LaptopList from './components/LaptopList';
 import ScanQR from './components/ScanQR';
@@ -6,9 +6,8 @@ import AddLaptopForm from './components/AddLaptopForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import RentalManagement from './components/RentalManagement';
-import LaptopRentalForm from './components/LaptopRentalForm'; // Import nowego komponentu
-// Removed duplicate import
-import { jwtDecode } from 'jwt-decode';
+import LaptopRentalForm from './components/LaptopRentalForm';
+import AuthService from './services/AuthService';
 import './App.css';
 
 const App = () => {
@@ -17,32 +16,30 @@ const App = () => {
   const [username, setUsername] = useState('');
   const location = useLocation();
   const [theme, setTheme] = useState(() => {
-    // Get theme from localStorage or default to 'light'
     const savedTheme = localStorage.getItem('theme');
     return savedTheme || 'light';
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setIsAdmin(decoded.role === 'admin');
-        setIsLoggedIn(true);
-        setUsername(decoded.email || 'Użytkownik');
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        setIsLoggedIn(false);
-      }
+    checkLoginStatus();
+  }, [location]);
+
+  const checkLoginStatus = () => {
+    const isUserLoggedIn = AuthService.isLoggedIn();
+    setIsLoggedIn(isUserLoggedIn);
+    
+    if (isUserLoggedIn) {
+      const user = AuthService.getCurrentUser();
+      setIsAdmin(user?.role === 'admin');
+      setUsername(user?.email || 'Użytkownik');
     } else {
       setIsAdmin(false);
-      setIsLoggedIn(false);
+      setUsername('');
     }
-  }, [location]); // Keep this useEffect for auth check
+  };
 
-  // Effect to apply theme class to body and save to localStorage
   useEffect(() => {
-    document.body.classList.remove('light-mode', 'dark-mode'); // Remove previous classes
+    document.body.classList.remove('light-mode', 'dark-mode');
     document.body.classList.add(`${theme}-mode`);
     localStorage.setItem('theme', theme);
   }, [theme]);
@@ -51,10 +48,11 @@ const App = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    await AuthService.logout();
     setIsAdmin(false);
     setIsLoggedIn(false);
+    setUsername('');
     return <Navigate to="/" />;
   };
 
@@ -128,7 +126,6 @@ const App = () => {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/rentals" element={isAdmin ? <RentalManagement /> : <Navigate to="/" />} />
           <Route path="/edit-laptop/:id" element={isAdmin ? <AddLaptopForm /> : <Navigate to="/" />} />
-          {/* Nowa trasa dla formularza wypożyczenia po numerze seryjnym */}
           <Route path="/laptop/serial/:serialNumber" element={<LaptopRentalForm />} />
         </Routes>
       </main>

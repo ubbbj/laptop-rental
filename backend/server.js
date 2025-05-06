@@ -6,24 +6,23 @@ const path = require('path');
 const laptopRoutes = require('./routes/laptops');
 const { router: authRouter, authenticate, isAdmin } = require('./routes/auth');
 const rentalRoutes = require('./routes/rentals');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
-// Inicjalizacja aplikacji Express
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
-// Serve static files from uploads directory at root level
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Konfiguracja dozwolonych źródeł
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',')
-  .map(origin => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean)
+  : ['http://localhost:3000'];
 console.log('Allowed origins:', allowedOrigins);
 
 app.use(cors({
@@ -39,7 +38,6 @@ app.use(cors({
   credentials: true
 }));
 
-// Połączenie z MongoDB
 console.log('Connecting to MongoDB...');
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -51,32 +49,52 @@ mongoose.connect(process.env.MONGO_URI, {
     process.exit(1);
   });
 
-// Użycie routerów
 app.use('/api/auth', authRouter);
 
-// Używamy laptopRoutes dla wszystkich tras /api/laptops
 app.use('/api/laptops', laptopRoutes);
 app.use('/api/rentals', rentalRoutes);
 
-// Endpoint główny
-app.get('/', (req, res) => res.send('API is running'));
-
-// Obsługa błędów
-app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
+app.get('/', (req, res) => {
+  res.send({
+    name: 'Laptop Rental API',
+    version: '1.0.0',
+    status: 'running',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date()
+  });
 });
 
-// Uruchomienie serwera
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🔄 MongoDB connection state: ${mongoose.connection.readyState}`);
+  console.log(`⚙️ Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 process.on('SIGINT', () => {
   server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+    console.log('\nServer closed gracefully');
+    mongoose.connection.close(false, () => {
+      console.log('MongoDB connection closed');
+      process.exit(0);
+    });
   });
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  server.close(() => {
+    console.log('Server closed due to uncaught exception');
+    process.exit(1);
+  });
+  setTimeout(() => {
+    process.exit(1);
+  }, 1000);
 });

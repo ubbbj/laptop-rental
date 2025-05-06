@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import AuthService from '../services/AuthService';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -26,17 +25,7 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/login`,
-        formData
-      );
-
-      localStorage.setItem('token', response.data.token);
-      
-      // Debug - wyświetl token i dane użytkownika
-      const decoded = jwtDecode(response.data.token);
-      console.log('Login successful - Decoded token:', decoded);
-      
+      await AuthService.login(formData.email, formData.password);
       navigate('/');
     } catch (err) {
       console.error('Login error details:', err.response?.data || err.message);

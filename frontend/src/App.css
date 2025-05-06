@@ -1,19 +1,16 @@
-/* Modern Color Palette */
 :root {
-  /* Base Colors */
   --primary: #3498db;
   --primary-dark: #2980b9;
-  --secondary-base: #2c3e50; /* Renamed from --secondary */
-  --success-base: #2ecc71;   /* Renamed from --success */
-  --danger-base: #e74c3c;    /* Renamed from --danger */
-  --danger-hover-background: #c0392b; /* Added for hover state */
-  --warning-base: #f39c12;   /* Renamed from --warning */
-  --light-base: #f8f9fa;     /* Renamed from --light */
-  --dark-base: #343a40;      /* Renamed from --dark */
-  --gray-base: #6c757d;      /* Renamed from --gray */
-  --white-base: #ffffff;     /* Renamed from --white */
+  --secondary-base: #2c3e50;
+  --success-base: #2ecc71;
+  --danger-base: #e74c3c;
+  --danger-hover-background: #c0392b;
+  --warning-base: #f39c12;
+  --light-base: #f8f9fa;
+  --dark-base: #343a40;
+  --gray-base: #6c757d;
+  --white-base: #ffffff;
 
-  /* Theme Variables (Light Mode - Default) */
   --background-color: #f5f7fa;
   --text-color: var(--dark-base);
   --card-background: var(--white-base);
@@ -68,7 +65,7 @@ body.dark-mode {
   --button-text: #1a1a2e;
   --button-hover-background: #4a90c2;
   --danger-background: #e57373;
-  --danger-hover-background: #d32f2f; /* Darker red for dark mode hover */
+  --danger-hover-background: #d32f2f;
   --danger-text: #1a1a2e;
   --success-background: #81c784;
   --success-text: #1a1a2e;
@@ -88,13 +85,13 @@ body.dark-mode {
   --no-results-text: #b0b0d0;
   --no-results-border: #4a4a5e;
   --login-required-background: #2a2a3e;
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow for dark mode */
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .App {
@@ -129,12 +126,12 @@ nav a {
 }
 
 nav a:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Keep this for subtle hover on nav */
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .logout-button {
   margin-left: auto;
-  background-color: rgba(255, 255, 255, 0.1); /* Keep this for subtle hover on nav */
+  background-color: rgba(255, 255, 255, 0.1);
   color: var(--nav-text-color);
   border: none;
   padding: 15px 20px;
@@ -145,10 +142,9 @@ nav a:hover {
 
 .logout-button:hover {
   background-color: var(--danger-background);
-  color: var(--danger-text); /* Ensure text is readable */
+  color: var(--danger-text);
 }
 
-/* Headings */
 h2 {
   color: var(--secondary-text-color);
   margin-bottom: 25px;
@@ -176,7 +172,6 @@ h2 {
   overflow: hidden;
 }
 
-/* Style dla sekcji ze szczegółami laptopa */
 .laptop-expanded-details {
   margin-top: 15px;
   padding: 15px;
@@ -202,7 +197,7 @@ h2 {
   margin: 0;
   padding: 0;
   line-height: 1.5;
-  color: var(--text-color); /* Use general text color */
+  color: var(--text-color);
   font-size: 0.9rem;
 }
 
@@ -262,14 +257,13 @@ h2 {
   font-weight: 600;
 }
 
-/* Usunięcie obramowania i poprawa stylu obrazków laptopów */
 .laptop-image {
   position: relative;
   margin: 15px auto;
   overflow: hidden;
-  border-radius: 0; /* Usunięcie zaokrąglonych rogów */
-  box-shadow: none; /* Usunięcie cienia */
-  background-color: transparent; /* Usunięcie tła */
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent; 
   transition: transform 0.3s ease;
   max-width: 200px;
   height: auto;
@@ -310,7 +304,6 @@ h2 {
   border-radius: 8px;
 }
 
-/* Galeria zdjęć */
 .laptop-gallery {
   display: flex;
   gap: 8px;
@@ -377,7 +370,7 @@ h2 {
   max-width: 500px;
   margin: 0 auto;
   padding: 25px;
-  background-color: var(--card-background); /* Use card background for consistency */
+  background-color: var(--card-background);
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
@@ -385,7 +378,7 @@ h2 {
 .scan-result {
   margin-top: 20px;
   padding: 15px;
-  background-color: var(--expanded-details-background); /* Use expanded details background */
+  background-color: var(--expanded-details-background);
   border-radius: 10px;
   border-left: 4px solid var(--primary-text-color);
 }
@@ -415,7 +408,7 @@ button:hover {
   max-width: 450px;
   margin: 0 auto;
   padding: 30px 35px;
-  background-color: var(--card-background); /* Use card background for forms */
+  background-color: var(--card-background);
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
@@ -440,30 +433,30 @@ button:hover {
   transition: var(--transition);
   font-size: 15px;
   background-color: var(--input-background);
-  color: var(--text-color); /* Ensure input text color matches theme */
+  color: var(--text-color);
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .form-group input:focus {
   border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2), inset 0 1px 3px rgba(0,0,0,0.05); /* Keep shadow for focus indication */
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2), inset 0 1px 3px rgba(0,0,0,0.05);
   outline: none;
   background-color: var(--input-focus-background);
 }
 
 .form-group textarea {
-  width: 94%; /* Dopasowanie do input */
+  width: 94%;
   padding: 12px 15px;
   border: 1px solid var(--input-border);
   border-radius: 8px;
   transition: var(--transition);
   font-size: 15px;
   background-color: var(--input-background);
-  color: var(--text-color); /* Zapewnienie koloru tekstu z motywu */
+  color: var(--text-color);
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-  font-family: inherit; /* Dziedziczenie czcionki */
-  resize: vertical; /* Pozwolenie tylko na zmianę wysokości */
-  min-height: 80px; /* Minimalna wysokość */
+  font-family: inherit;
+  resize: vertical; 
+  min-height: 80px; 
 }
 
 .form-group textarea:focus {
@@ -474,11 +467,11 @@ button:hover {
 }
 
 .input-error {
-  border-color: var(--danger-base) !important; /* Use base danger color for error border */
+  border-color: var(--danger-base) !important;
 }
 
 .error-text {
-  color: var(--danger-base); /* Use base danger color for error text */
+  color: var(--danger-base);
   font-size: 14px;
   margin-top: 5px;
   display: block;
@@ -491,7 +484,7 @@ button:hover {
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border-left: 4px solid var(--danger-base); /* Use base danger color for border */
+  border-left: 4px solid var(--danger-base);
   font-weight: 500;
 }
 
@@ -501,7 +494,7 @@ button:hover {
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border-left: 4px solid var(--success-base); /* Use base success color for border */
+  border-left: 4px solid var(--success-base);
   font-weight: 500;
 }
 
@@ -516,7 +509,7 @@ button:hover {
 }
 
 .submit-button:disabled {
-  background-color: var(--gray-base); /* Use base gray for disabled */
+  background-color: var(--gray-base);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -535,30 +528,29 @@ button:hover {
 }
 
 .delete-button:hover {
-  background-color: var(--danger-hover-background); /* Use variable for hover */
+  background-color: var(--danger-hover-background);
 }
 
-/* Styles for admin action buttons in LaptopList */
 .laptop-admin-actions {
-  display: flex; /* Ustawia elementy w rzędzie */
-  gap: 10px; /* Dodaje odstęp między przyciskami */
-  margin-top: 15px; /* Dodaje odstęp od góry */
-  align-items: center; /* Wyrównuje przyciski w pionie */
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center; 
 }
 
 .edit-button,
 .delete-button {
-  margin-top: 0; /* Usuwa domyślny margines górny z przycisków, jeśli istnieje */
-  padding: 8px 16px; /* Ujednolica padding */
-  font-size: 14px; /* Ujednolica rozmiar czcionki */
+  margin-top: 0; 
+  padding: 8px 16px; 
+  font-size: 14px; 
 }
 
 .edit-button {
-  background-color: var(--warning); /* Zmiana koloru dla odróżnienia */
+  background-color: var(--warning);
 }
 
 .edit-button:hover {
-  background-color: #e67e22; /* Ciemniejszy odcień warning */
+  background-color: #e67e22;
 }
 
 .delete-button {
@@ -569,7 +561,6 @@ button:hover {
   background-color: #c0392b;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .nav-links {
     flex-direction: column;
@@ -586,7 +577,6 @@ button:hover {
   }
 }
 
-/* Animation for cards */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -643,8 +633,8 @@ button:hover {
   padding: 12px 15px;
   width: 100%;
   border: 1px solid var(--input-border);
-  background-color: var(--input-background); /* Add background for search input */
-  color: var(--text-color); /* Add text color for search input */
+  background-color: var(--input-background);
+  color: var(--text-color);
   border-radius: 8px;
   font-size: 16px;
   transition: var(--transition);
@@ -652,9 +642,9 @@ button:hover {
 
 .search-input:focus {
   border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); /* Keep focus shadow */
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
   outline: none;
-  background-color: var(--input-focus-background); /* Add focus background */
+  background-color: var(--input-focus-background);
 }
 
 .sort-box {
@@ -667,15 +657,15 @@ button:hover {
   padding: 10px;
   border: 1px solid var(--input-border);
   border-radius: 8px;
-  background-color: var(--input-background); /* Use input background */
-  color: var(--text-color); /* Add text color */
+  background-color: var(--input-background); 
+  color: var(--text-color);
   transition: var(--transition);
 }
 
 .sort-select:focus {
   border-color: var(--input-focus-border);
   outline: none;
-  background-color: var(--input-focus-background); /* Add focus background */
+  background-color: var(--input-focus-background);
 }
 
 /* No results message */
@@ -689,7 +679,6 @@ button:hover {
   border: 1px dashed var(--no-results-border);
 }
 
-/* Laptop card improvements */
 .laptop-header {
   display: flex;
   justify-content: space-between;
@@ -712,14 +701,14 @@ button:hover {
 }
 
 .laptop-card.rented::before {
-  background-color: var(--danger-background); /* Use theme-aware danger background */
+  background-color: var(--danger-background);
 }
 
 /* Login and Register forms */
 .login-required, .admin-required {
   text-align: center;
   background-color: var(--login-required-background);
-  color: var(--text-color); /* Ensure text is readable */
+  color: var(--text-color);
   padding: 40px 20px;
   border-radius: 8px;
   max-width: 500px;
@@ -732,9 +721,8 @@ button:hover {
   font-size: 18px;
 }
 
-/* Style dla rozwijanej specyfikacji w LaptopList */
 .toggle-specs-button {
-  background: transparent; /* Explicitly set background */
+  background: transparent;
   border: 1px solid var(--toggle-specs-border);
   padding: 5px 10px;
   margin-top: 10px;
@@ -756,22 +744,19 @@ button:hover {
   border-top: 1px dashed var(--specs-border);
 }
 
-/* Dodano style dla obrazka w karcie laptopa */
 .laptop-image img {
-  max-width: 100px; /* Ograniczenie szerokości miniaturki */
+  max-width: 100px;
   height: auto;
   border-radius: 4px;
   margin-bottom: 10px;
 }
 
-/* Dodano style dla opisu */
 .laptop-description {
   font-size: 14px;
-  color: var(--text-color); /* Use general text color */
+  color: var(--text-color);
   margin-top: 10px;
 }
 
-/* Dodano style dla listy specyfikacji */
 .laptop-specs ul {
   list-style: none;
   padding: 0;
@@ -783,7 +768,6 @@ button:hover {
   margin-bottom: 3px;
 }
 
-/* Styles for file upload in AddLaptopForm */
 .file-upload-container {
   display: flex;
   align-items: center;

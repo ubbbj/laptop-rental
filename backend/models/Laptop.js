@@ -15,26 +15,23 @@ const LaptopSchema = new mongoose.Schema({
   model: { type: String, required: true },
   serialNumber: { type: String, required: true, unique: true },
   qrCode: String,
-  description: String, // Dodano opis
-  specs: { // Dodano specyfikację
+  description: String,
+  specs: {
     cpu: String,
     ram: String,
     disk: String,
-    // Można dodać więcej pól specyfikacji w przyszłości
   },
-  images: [String], // Dodano tablicę URL-i zdjęć
+  images: [String],
   isRented: { type: Boolean, default: false },
-  // Usunięto rentedBy i rentedAt z głównego schematu
   rentalStatus: { type: String, enum: ['pending', 'confirmed'], default: null },
   rentalDetails: {
     fullName: String,
     email: String,
     phone: String,
-    startDate: Date, // Dodano datę rozpoczęcia
-    endDate: Date,   // Dodano datę zakończenia
-    rentedAt: Date // Data złożenia wniosku
+    startDate: Date,
+    endDate: Date,
+    rentedAt: Date
   },
-  // Usunięto isReserved i reservation
 });
 
 module.exports = mongoose.model('Laptop', LaptopSchema);
